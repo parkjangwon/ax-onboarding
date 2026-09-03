@@ -122,3 +122,18 @@ sbroenne/mcp-server-excel@excel-mcp 1.6K installs
     expect(skills[0].installCommand).toBe('npx skills add claude-office-skills/skills@excel-automation -y');
   });
 });
+
+describe('McpFinder', () => {
+  it('should parse smithery MCP search output properly', () => {
+    const mockOutput = `
+{"name":"ThinAir Data","qualifiedName":"thinair/data","description":"Connect AI assistants to PostgreSQL, MySQL, or SQL Server.","useCount":20,"connectionUrl":"https://server.smithery.ai/thinair/data"}
+{"name":"PlanetScale","qualifiedName":"planetscale","description":"Manage databases and execute SQL queries securely.","useCount":2,"connectionUrl":"https://server.smithery.ai/planetscale"}
+`;
+    const { McpFinder } = require('../src/core/mcp-finder.js');
+    const mcps = McpFinder.parseOutput(mockOutput);
+    expect(mcps.length).toBe(2);
+    expect(mcps[0].id).toBe('thinair/data');
+    expect(mcps[0].name).toBe('ThinAir Data');
+    expect(mcps[0].installCommand).toContain('thinair/data');
+  });
+});

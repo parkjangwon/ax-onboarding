@@ -127,6 +127,19 @@ async function main() {
     });
   }
 
+  // Dynamic MCP discovery from Smithery
+  console.log('\n🦾 Smithery 에서 팔과 다리가 되어줄 최적의 MCP 서버 검색 중...');
+  const { McpFinder } = await import('./core/mcp-finder.js');
+  const discoveredMcps = McpFinder.search(searchKeyword, 2);
+
+  if (discoveredMcps.length > 0) {
+    console.log('\n✨ [Smithery 추천 MCP 서버 발견]');
+    discoveredMcps.forEach(m => {
+      console.log(` • ${m.id} (${m.name})`);
+      console.log(`   설명: ${m.description.slice(0, 80)}...`);
+    });
+  }
+
   console.log('\n------------------------------------------------------');
   const confirm = await rl.question('\n이 청사진대로 로컬 에이전트 환경에 자동 세팅(프로비저닝)할까요? (Y/n): ');
   if (confirm.trim().toLowerCase() !== 'n') {
