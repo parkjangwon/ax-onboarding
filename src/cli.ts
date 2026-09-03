@@ -15,6 +15,21 @@ async function main() {
   console.log('       Transforming Daily Work into Agentic Power     ');
   console.log('======================================================\n');
 
+  // Handle Rollback flag
+  if (process.argv.includes('--rollback') || process.argv.includes('-r')) {
+    const { RollbackManager } = await import('./core/rollback.js');
+    const result = RollbackManager.rollback();
+    console.log('✨ [Rollback 완료] 에이전트 설정 및 생성 파일이 안전하게 원상복구되었습니다.');
+    if (result.restoredFiles.length > 0) {
+      result.restoredFiles.forEach(f => console.log(` - 복원됨: ${f}`));
+    }
+    if (result.deletedFiles.length > 0) {
+      result.deletedFiles.forEach(f => console.log(` - 정리됨: ${f}`));
+    }
+    rl.close();
+    process.exit(0);
+  }
+
   // Check for auto-detected Addon
   let addon = AddonLoader.autoDetectAddon();
   if (addon) {
@@ -143,11 +158,26 @@ async function main() {
   console.log('\n------------------------------------------------------');
   const confirm = await rl.question('\n이 청사진대로 로컬 에이전트 환경에 자동 세팅(프로비저닝)할까요? (Y/n): ');
   if (confirm.trim().toLowerCase() !== 'n') {
+    // 1. Check if DB credentials needed
+    const needsDb = archetype.category === 'tech' || addon?.addonId?.includes('acme');
+    if (needsDb) {
+      console.log('\n🔒 [보안 인증 설정] DB 연결 환경 점검:');
+      const dbUser = (await rl.question('사용할 DB 사용자 계정을 입력하세요 (기본: readonly): ')).trim() || 'readonly';
+      const { CredentialManager } = await import('./core/credentials.js');
+      const secCheck = CredentialManager.validateDbSecurity(dbUser);
+      if (!secCheck.isSafe) {
+        console.log('\n⚠️  ' + secCheck.warnings.join('\n⚠️  ') + '\n');
+      } else {
+        console.log('✅ [보안 검증 완료] 안전한 READONLY 계정 정책 준수 확인.');
+      }
+    }
+
+    // 2. Dispatch adapters (generates CLAUDE.md, AGENTS.md, runbooks/ etc.)
     const result = AdapterRegistry.dispatch(agentEnvironment, blueprint);
 
-    // Optionally install discovered skills
+    // 3. Optionally install discovered skills
     if (discoveredSkills.length > 0) {
-      const installSkills = await rl.question('위 추천 오픈소스 스킬도 함께 설치할까요? (Y/n): ');
+      const installSkills = await rl.question('\n위 추천 오픈소스 스킬도 함께 설치할까요? (Y/n): ');
       if (installSkills.trim().toLowerCase() !== 'n') {
         const { execSync } = await import('node:child_process');
         for (const s of discoveredSkills) {
@@ -161,8 +191,17 @@ async function main() {
       }
     }
 
+    // 4. Preflight Health Check
+    console.log('\n🏥 [Pre-flight 헬스체크] 가동 상태 및 보안 격리 점검 중...');
+    const { PreflightHealthCheck } = await import('./core/healthcheck.js');
+    const healthChecks = PreflightHealthCheck.runAll(process.cwd());
+    healthChecks.forEach(hc => {
+      const badge = hc.securityLevel === 'PASSED' ? '✅' : hc.securityLevel === 'WARNING' ? '⚠️ ' : '❌';
+      console.log(` ${badge} ${hc.name}: ${hc.message}`);
+    });
+
     console.log('\n✨ 축하합니다! 에이전틱 환경 프로비저닝이 완료되었습니다.');
-    console.log('생성/수정된 설정 파일:');
+    console.log('생성/수정된 설정 및 실전 런북 파일:');
     result.modifiedFiles.forEach(f => console.log(` - ${f}`));
 
     console.log('\n======================================================');
@@ -172,6 +211,7 @@ async function main() {
     console.log('\n에이전트에게 지금 당장 아래 문장을 던져보세요:');
     console.log(`👉 "${blueprint.actionPlan.day1QuickWin.samplePrompt}"`);
     console.log(`\n기대 효과: ${blueprint.actionPlan.day1QuickWin.expectedResult}\n`);
+    console.log('💡 Tip: 설정 원상복구가 필요할 땐 언제든 `bun start --rollback` 을 실행하세요.\n');
   } else {
     console.log('\n프로비저닝이 취소되었습니다.');
   }

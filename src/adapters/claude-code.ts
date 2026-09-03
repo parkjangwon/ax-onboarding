@@ -13,6 +13,11 @@ export class ClaudeCodeAdapter {
     fs.writeFileSync(claudeMdPath, claudeMdContent, 'utf-8');
     modifiedFiles.push(claudeMdPath);
 
+    // 2. Inject production runbooks into targetDir/runbooks
+    const { RunbookInjector } = require('../core/runbooks.js');
+    const runbookFiles = RunbookInjector.inject(targetDir);
+    modifiedFiles.push(...runbookFiles);
+
     // 2. Prepare MCP configuration snippet
     const homeDir = os.homedir();
     const claudeJsonPath = path.join(homeDir, '.claude.json');

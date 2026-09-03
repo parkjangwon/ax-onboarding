@@ -137,3 +137,74 @@ describe('McpFinder', () => {
     expect(mcps[0].installCommand).toContain('thinair/data');
   });
 });
+
+describe('Security: CredentialManager', () => {
+  it('should flag dangerous admin/root database users', () => {
+    const { CredentialManager } = require('../src/core/credentials.js');
+    expect(CredentialManager.validateDbSecurity('root').isSafe).toBe(false);
+    expect(CredentialManager.validateDbSecurity('admin').isSafe).toBe(false);
+    expect(CredentialManager.validateDbSecurity('sa').isSafe).toBe(false);
+    expect(CredentialManager.validateDbSecurity('readonly').isSafe).toBe(true);
+    expect(CredentialManager.validateDbSecurity('svc_dev_ro').isSafe).toBe(true);
+  });
+
+  it('should save credentials with 0600 mode and update .gitignore', () => {
+    const { CredentialManager } = require('../src/core/credentials.js');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-cred-'));
+    
+    const envPath = CredentialManager.saveSecureEnv(tempDir, {
+      DB_HOST: '10.1.1.20',
+      DB_USER: 'readonly'
+    });
+
+    expect(fs.existsSync(envPath)).toBe(true);
+    const stat = fs.statSync(envPath);
+    // mode 0600 is 33152 in octal stat
+    expect(stat.mode & 0o777).toBe(0o600);
+
+    const gitignoreContent = fs.readFileSync(path.join(tempDir, '.gitignore'), 'utf-8');
+    expect(gitignoreContent).toContain('.env.mcp');
+
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+});
+
+describe('RunbookInjector & Preflight', () => {
+  it('should inject 5 real-world runbooks into targetDir', () => {
+    const { RunbookInjector } = require('../src/core/runbooks.js');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-rb-'));
+
+    const injected = RunbookInjector.inject(tempDir);
+    expect(injected.length).toBe(5);
+    expect(fs.existsSync(path.join(tempDir, 'runbooks', '01-troubleshoot.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, 'runbooks', '02-customer-inquiry.md'))).toBe(true);
+    expect(fs.existsSync(path.join(tempDir, 'runbooks', '05-security-audit.md'))).toBe(true);
+
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it('should run preflight healthcheck cleanly', () => {
+    const { PreflightHealthCheck } = require('../src/core/healthcheck.js');
+    const checks = PreflightHealthCheck.runAll(process.cwd());
+    expect(checks.length).toBeGreaterThanOrEqual(3);
+    expect(checks.some(c => c.name.includes('Git'))).toBe(true);
+  });
+});
+
+describe('RollbackManager', () => {
+  it('should cleanly remove generated files during rollback', () => {
+    const { RollbackManager } = require('../src/core/rollback.js');
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-rbk-'));
+
+    fs.writeFileSync(path.join(tempDir, 'CLAUDE.md'), 'test');
+    fs.mkdirSync(path.join(tempDir, 'runbooks'));
+    fs.writeFileSync(path.join(tempDir, 'runbooks', 'dummy.md'), 'test');
+
+    const res = RollbackManager.rollback(tempDir);
+    expect(res.deletedFiles.length).toBeGreaterThanOrEqual(2);
+    expect(fs.existsSync(path.join(tempDir, 'CLAUDE.md'))).toBe(false);
+    expect(fs.existsSync(path.join(tempDir, 'runbooks'))).toBe(false);
+
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+});

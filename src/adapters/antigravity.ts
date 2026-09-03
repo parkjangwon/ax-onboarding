@@ -12,6 +12,11 @@ export class AntigravityAdapter {
     fs.writeFileSync(agentsMdPath, content, 'utf-8');
     modifiedFiles.push(agentsMdPath);
 
+    // 2. Inject production runbooks into targetDir/runbooks
+    const { RunbookInjector } = require('../core/runbooks.js');
+    const runbookFiles = RunbookInjector.inject(targetDir);
+    modifiedFiles.push(...runbookFiles);
+
     return { success: true, modifiedFiles };
   }
 
