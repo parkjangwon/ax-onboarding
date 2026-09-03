@@ -82,17 +82,22 @@ Conduct a 1:1 interview asking about:
      `npx skills find <query>`
    - Present discovered skills with install count and link (e.g. `claude-office-skills/skills@excel-automation`).
 
-### Phase 4: One-Click Provisioning
-Ask for user confirmation:
-> "위 청사진대로 현재 워크스페이스에 작업 규약 문서(`CLAUDE.md` / `AGENTS.md`), 도구 설정 및 추천 스킬(`npx skills add ...`)을 설치할까요?"
+### Phase 4: Non-Destructive Provisioning
+1. **Existing Environment Inspection (기존 자산 확인)**:
+   - Check `~/.claude.json` or local settings to see what MCP servers or tools are already installed.
+   - If an MCP (e.g. MariaDB, SSH, Slack) already exists, reuse it gracefully and do not create duplicate configurations.
+2. **Dedicated Isolation & Non-Destructive Reference**:
+   - Write the generated task rules, ground rules, and autonomous routing to dedicated files: `~/.ax/CLAUDE.md` and/or `~/.ax/AGENTS.md`.
+   - **NEVER overwrite the user's existing `CLAUDE.md` or `AGENTS.md`!**
+   - Check if `~/.claude/CLAUDE.md` exists. If so, cleanly append `@~/.ax/CLAUDE.md` at the end so existing user rules are 100% preserved.
+3. **Runbooks Deployment**:
+   - Deploy the 5 production runbooks into `~/.ax/runbooks/` (troubleshoot, customer inquiry, safe patch, browser e2e, security audit).
+4. **Autonomous Natural Language Routing (무명령어 원칙)**:
+   - Ensure the generated rules instruct the agent: **"사용자에게 어떠한 명령어(/command)나 런북 파일 경로 입력도 요구하지 말고, 일상어로 말하면 백그라운드에서 적절한 런북과 도구를 무의식적인 반사신경으로 가동할 것."**
 
-Upon confirmation:
-- Install selected skills: `npx skills add <package> -y`
-- Write `CLAUDE.md` and/or `AGENTS.md` containing the customized persona, ground rules, and task matrix.
-- Advise on any required MCP credentials (e.g. READONLY DB user creation command).
-
-### Phase 5: Day-1 Quick Win
-Give the user an exact prompt to test right away:
-> "축하합니다! 이제 첫 번째 과업을 바로 실행해 볼 차례입니다.  
-> 지금 에이전트에게 아래 문장을 그대로 입력해 보세요:  
-> 👉 `[Sample Prompt for the User's Real Task]`"
+### Phase 5: Contextual Day-1 Quick Win (내 자리의 실제 데이터로 체감하기)
+1. Inspect the user's current project or workspace to find a real, tangible target (e.g., recent error log, uncommitted git diff, customer issue ticket, or unmerged spreadsheet).
+2. Give the user an exact prompt to test right away on their actual data:
+   > "축하합니다! 온보딩과 무기고 세팅이 완료되었습니다.  
+   > 이제 에이전트에게 명령어나 파일 이름을 칠 필요 없이, 평소 동료에게 말하듯 편하게 아래처럼 한마디만 던져보세요:  
+   > 👉 `[User's Real Contextual Task Prompt in Natural Language]`"
