@@ -26,6 +26,18 @@
       "axOpportunity": "CLAUDE.md / AGENTS.md에 사내 그라운드 룰(최소 수정 범위, 하위 호환성 원칙, 팀 컨벤션)을 주입해 안전한 코드 작성 유도"
     }
   ],
+  "manualBoundaries": [
+    {
+      "task": "고객사 폐쇄망 IDC 현장 방문 장애 대응",
+      "reason": "외부망 및 원격 VPN 완전 차단으로 현재 PC에서 접근 불가",
+      "humanActionNote": "엔지니어가 직접 현장 출장 및 콘솔 장비 연결하여 수동 조치 유지"
+    },
+    {
+      "task": "서버 랙 마운트 및 하드웨어 케이블 실물 교체",
+      "reason": "물리적 현장 장비 교체 작업",
+      "humanActionNote": "사람 직접 수행 영역으로 유지"
+    }
+  ],
   "recommendedToolchain": {
     "mcps": ["ssh-mcp", "mariadb-readonly-mcp", "codegraph-mcp", "s3-mcp"],
     "skills": ["git-workflow", "cso-security", "rtk-token-optimizer"],

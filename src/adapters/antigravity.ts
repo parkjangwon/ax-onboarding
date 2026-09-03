@@ -73,9 +73,13 @@ Automatically map user intents to internal runbooks and tools in the background:
 - UI defects -> Apply \`~/.ax/runbooks/04-browser-e2e.md\` (Playwright inspection).
 - Data, sheets, stock, orders -> Call connected MCP tools silently.
 
-## Task Delegation Matrix
+## Task Delegation Matrix (Verified Feasible on PC)
 ${taskList}
 
+${(blueprint.manualTasks || []).length > 0 ? `## Human-Only Boundaries (Do NOT Attempt with Agent)
+The following tasks involve physical on-site presence, air-gapped networks, or face-to-face interactions. The agent MUST NOT attempt to handle these autonomously:
+${blueprint.manualTasks!.map(m => `- **${m.taskName}**: ${m.reason} -> Maintain human manual action (${m.humanActionNote})`).join('\n')}
+` : ''}
 ## Recurring Routines
 - Automations and recurring schedules can be dispatched using the schedule tool or headless cron.
 `;

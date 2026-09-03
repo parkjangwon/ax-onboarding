@@ -54,21 +54,33 @@ Conduct a 1:1 interview asking about:
 - **Bottlenecks & Golden Time**: "내가 직접 하느라 다른 중요 업무가 밀리거나, 골든타임을 놓치기 쉬운 과업이 있나요?"
 - **Environment & Tools**: "현재 PC에서 SSH, DB, S3, 엑셀, 사내 형상관리(GitLab 등) 중 접근 가능한 리소스는 무엇인가요?"
 
-### Phase 3: AX Blueprint Generation & Live Skill Discovery
-1. Present a clean markdown table showing the Before vs. After comparison:
+### Phase 2.5: Feasibility & Reality Filter (현실성 검증: 되지 않는 것을 된다고 속이지 않기)
+⚠️ **절대 원칙**: "에이전트가 다 해줍니다" 같은 비현실적인 거짓말을 하지 마십시오.
+사용자가 언급한 각 업무에 대해 다음 3가지를 반드시 점검합니다:
+1. **네트워크 접근성**: "해당 시스템이나 서버에 지금 쓰시는 PC에서 VPN이나 SSH로 직접 접속이 가능한가요?" (고객사 폐쇄망, 현장 외근 출장 등 외부망 차단 환경 여부)
+2. **데이터 가용성**: "해당 데이터를 현재 PC에서 파일(엑셀, 로그)이나 DB 쿼리로 직접 열어볼 수 있나요?"
+3. **물리적 작업 여부**: 외근, 현장 장비 교체, 조리/칼질, 대면 미팅 등 사람이 몸으로 직접 뛰어야 하는 일인가요?
 
-| 업무명 | 현재 방식 (Before) | AX 방식 (After) | 필요 도구 (MCP / Skill) | 주기 (Ad-hoc / 루틴) |
+만약 원격 접근이 불가능하거나 물리적 작업이라면, 억지로 MCP를 붙이려 하지 말고 **[사람 고유 / 현장 수동 업무]**로 정직하게 분류하고 제외해야 합니다.
+
+### Phase 3: AX Blueprint Generation & Honest Separation
+1. Present two separate, honest markdown tables:
+
+#### ✅ AX 전환 가능 과업 (내 PC 환경에서 검증된 과업)
+| 업무명 | 현재 방식 (Before) | AX 방식 (After) | 필요 도구 (MCP / Skill) | 주기 |
 |---|---|---|---|---|
 | ... | ... | ... | ... | ... |
+
+#### 🛑 사람 직접 수행 과업 (현실적 제약으로 에이전트 제외)
+| 업무명 | 제외 사유 (현실적 제약) | 권장 조치 |
+|---|---|---|
+| 고객사 폐쇄망 IDC 장애 대응 | 외부망/원격 VPN 차단 (물리적 콘솔 필요) | 엔지니어 현장 출장 직접 대응 유지 |
+| 실물 장비/포장/조리 작업 | 물리적 현장 조작 필요 | 사람 직접 수행 영역으로 유지 |
 
 2. **Live Skill Discovery (via skills.sh / find-skills)**:
    - For domain-specific or specialized tasks (e.g. excel, react, review, deployment, shopify, docs), search the open skills ecosystem:
      `npx skills find <query>`
    - Present discovered skills with install count and link (e.g. `claude-office-skills/skills@excel-automation`).
-
-3. Highlight:
-- **Routine Automations**: Which tasks can be scheduled to run automatically before the user arrives.
-- **Enterprise Ground Rules**: Security constraints, READONLY DB rules, coding conventions.
 
 ### Phase 4: One-Click Provisioning
 Ask for user confirmation:

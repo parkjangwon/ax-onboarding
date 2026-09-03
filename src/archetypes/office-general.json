@@ -26,6 +26,18 @@
       "axOpportunity": "메모를 던지면 결정 사항, 미결 질문, 담당자별 To-Do가 표로 구조화된 공식 회의록으로 즉시 변환"
     }
   ],
+  "manualBoundaries": [
+    {
+      "task": "유관 부서 및 외부 협력사 대면 미팅 및 전화 조율",
+      "reason": "신뢰 형성 및 감정적 조율이 필요한 대면 인간 상호작용",
+      "humanActionNote": "담당자가 직접 대면 미팅 및 유선 통화 진행"
+    },
+    {
+      "task": "계약서 법인 인감 실물 날인 및 등기 우편 발송",
+      "reason": "법적 실물 인감 날인 및 오프라인 우체국 발송",
+      "humanActionNote": "사람 직접 수기 날인 및 발송 유지"
+    }
+  ],
   "recommendedToolchain": {
     "mcps": ["officecli-mcp", "notion-mcp", "slack-mcp", "playwright-browser-mcp"],
     "skills": ["humanize-korean", "excel-validator", "document-formatter"],

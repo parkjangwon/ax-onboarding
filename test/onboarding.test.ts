@@ -63,6 +63,7 @@ describe('TaskAnalyzer & Blueprint', () => {
     expect(blueprint.appliedAddon).toBe(acme.name);
     expect(blueprint.groundRules.some(r => r.includes('READONLY'))).toBe(true);
     expect(blueprint.tasks.length).toBeGreaterThan(0);
+    expect(blueprint.manualTasks && blueprint.manualTasks.length > 0).toBe(true);
     expect(blueprint.actionPlan.day1QuickWin.samplePrompt).toContain('오류 로그');
   });
 });

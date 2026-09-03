@@ -26,6 +26,18 @@
       "axOpportunity": "최근 14일간의 일평균 판매량을 분석하여 안전 재고 기준 도달 시 발주 권고 알림 발송"
     }
   ],
+  "manualBoundaries": [
+    {
+      "task": "상품 실물 검수, 박스 패키징 및 택배사 물품 인계",
+      "reason": "물리적 물품 포장 및 창고 적재 작업",
+      "humanActionNote": "사람 직접 포장 및 운송 인계 유지"
+    },
+    {
+      "task": "반품 상품 실물 훼손 상태 육안 검사",
+      "reason": "제품 오염 및 실물 파손 판별",
+      "humanActionNote": "작업자 직접 육안 검수 유지"
+    }
+  ],
   "recommendedToolchain": {
     "mcps": ["officecli-mcp", "playwright-browser-mcp"],
     "skills": ["review-auto-responder", "order-sheet-merger", "product-copywriter"],

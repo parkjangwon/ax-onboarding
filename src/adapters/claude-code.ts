@@ -116,6 +116,10 @@ ${rulesList}
 ## Agentic Tasks (에이전트 위임 과업)
 ${taskList}
 
+${(blueprint.manualTasks || []).length > 0 ? `## Human-Only Boundaries (사람 직접 수행 과업 - 에이전트 개입 금지)
+⚠️ 아래 과업은 외부망 차단, 현장 출장, 물리적 조작 등 현실적 제약이 있는 영역입니다. 에이전트는 이 작업을 대신하려 들지 말고 사람의 지침을 기다려야 합니다:
+${blueprint.manualTasks!.map(m => `- **${m.taskName}**: ${m.reason} (조치: ${m.humanActionNote})`).join('\n')}
+` : ''}
 ## Day-1 Quick Win Guide
 - **첫 번째 추천 과업**: ${blueprint.actionPlan.day1QuickWin.title}
 - **추천 프롬프트 (일상 자연어)**:

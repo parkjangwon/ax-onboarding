@@ -15,6 +15,12 @@ export interface RecommendedToolchain {
   routines?: string[];
 }
 
+export interface ManualBoundary {
+  task: string;
+  reason: string;
+  humanActionNote: string;
+}
+
 export interface RoleArchetype {
   id: string;
   name: string;
@@ -22,6 +28,7 @@ export interface RoleArchetype {
   description: string;
   routineQuestions: string[];
   commonPainPoints: PainPoint[];
+  manualBoundaries?: ManualBoundary[];
   recommendedToolchain: RecommendedToolchain;
 }
 
@@ -57,12 +64,26 @@ export interface OrganizationAddon {
   customQuestions?: string[];
 }
 
+export interface FeasibilityCheck {
+  networkAccessible: boolean;
+  dataAccessible: boolean;
+  isPhysicalOnSite: boolean;
+  notes?: string;
+}
+
+export interface ManualHumanTask {
+  taskName: string;
+  reason: string; // e.g., "고객사 폐쇄망/현장 직접 접속 필요", "물리적 조리/패키징 작업", "대면 협상 및 현장 실사"
+  humanActionNote: string;
+}
+
 export interface UserTaskAnalysis {
   taskName: string;
   currentWorkflow: string;
   axWorkflow: string;
   category: TaskCategory;
   opportunityScore: number;
+  feasibility?: FeasibilityCheck;
   requiredTools: {
     mcps: string[];
     skills: string[];
@@ -92,7 +113,8 @@ export interface AXBlueprint {
   detectedArchetype: string;
   appliedAddon?: string;
   groundRules: string[];
-  tasks: UserTaskAnalysis[];
+  tasks: UserTaskAnalysis[];          // 에이전트 전환이 실제 가능한 검증된 과업
+  manualTasks?: ManualHumanTask[];    // 네트워크/보안/물리적 제약으로 사람이 직접 수행해야 하는 과업
   actionPlan: {
     provisioningSteps: ProvisioningStep[];
     day1QuickWin: Day1QuickWin;

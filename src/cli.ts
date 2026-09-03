@@ -125,12 +125,20 @@ async function main() {
     console.log(`- 주입된 애드온: ${blueprint.appliedAddon}`);
   }
 
-  console.log('\n[에이전틱 전환 추천 과업]');
+  console.log('\n[✅ 에이전틱 전환 추천 과업 (현재 PC 환경 접근 검증됨)]');
   blueprint.tasks.forEach((t, idx) => {
     console.log(`\n${idx + 1}. [${t.taskName}] (${t.category})`);
     console.log(`   - 현재 방식: ${t.currentWorkflow}`);
     console.log(`   - AX 방식 : ${t.axWorkflow}`);
   });
+
+  if (blueprint.manualTasks && blueprint.manualTasks.length > 0) {
+    console.log('\n[🛑 사람 직접 수행 유지 과업 (폐쇄망/현장 출장/물리적 작업)]');
+    blueprint.manualTasks.forEach(m => {
+      console.log(` * [${m.taskName}]: ${m.reason}`);
+      console.log(`   ➔ 조치: ${m.humanActionNote}`);
+    });
+  }
 
   console.log('\n[적용될 그라운드 룰 (보안/컨벤션)]');
   blueprint.groundRules.forEach(r => console.log(` * ${r}`));

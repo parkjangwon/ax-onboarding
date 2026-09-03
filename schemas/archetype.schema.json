@@ -25,6 +25,18 @@
         }
       }
     },
+    "manualBoundaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task", "reason", "humanActionNote"],
+        "properties": {
+          "task": { "type": "string" },
+          "reason": { "type": "string" },
+          "humanActionNote": { "type": "string" }
+        }
+      }
+    },
     "recommendedToolchain": {
       "type": "object",
       "properties": {

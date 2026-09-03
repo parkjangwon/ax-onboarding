@@ -91,6 +91,13 @@ export class TaskAnalyzer {
     // Day 1 Quick win
     const day1QuickWin = this.generateQuickWin(archetype, addon);
 
+    // Filter and map human-only / on-site boundaries (no fake automation)
+    const manualTasks = (archetype.manualBoundaries || []).map(b => ({
+      taskName: b.task,
+      reason: b.reason,
+      humanActionNote: b.humanActionNote
+    }));
+
     return {
       userProfile: {
         name: interview.name,
@@ -102,6 +109,7 @@ export class TaskAnalyzer {
       appliedAddon: addon?.name,
       groundRules,
       tasks,
+      manualTasks,
       actionPlan: {
         provisioningSteps,
         day1QuickWin

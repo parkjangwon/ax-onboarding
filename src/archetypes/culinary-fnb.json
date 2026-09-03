@@ -26,6 +26,18 @@
       "axOpportunity": "구두 설명이나 대략적인 재료 목록을 주방 인쇄용 1장 표준 조리 매뉴얼(SOP)로 규격화"
     }
   ],
+  "manualBoundaries": [
+    {
+      "task": "식자재 칼질 손질, 팬 조리, 가열 및 플레이팅",
+      "reason": "미각, 후각, 불 조절 및 물리적 주방 조리 행위",
+      "humanActionNote": "셰프 및 조리사가 직접 주방에서 요리 수행 유지"
+    },
+    {
+      "task": "매장 홀 고객 대면 응대 및 테이블 서빙",
+      "reason": "현장 손님 환대 및 물리적 음식 전달",
+      "humanActionNote": "홀 직원 직접 서빙 및 고객 소통 유지"
+    }
+  ],
   "recommendedToolchain": {
     "mcps": ["officecli-mcp", "ocr-receipt-mcp"],
     "skills": ["recipe-cost-calculator", "daily-order-sheet-generator", "sop-formatter"],
