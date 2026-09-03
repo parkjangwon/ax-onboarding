@@ -20,20 +20,15 @@ echo "    Transforming Daily Work into Agentic Power        "
 echo "======================================================"
 echo -e "${NC}"
 
-# 1. Check runtime (Bun or Node.js)
-RUNNER=""
-if command -v bun >/dev/null 2>&1; then
-  RUNNER="bun"
-elif command -v node >/dev/null 2>&1; then
-  RUNNER="node"
-else
-  echo -e "${RED}❌ Node.js 또는 Bun 런타임이 감지되지 않았습니다.${NC}"
-  echo "Node.js (>= 18) 또는 Bun을 먼저 설치해 주세요."
+# 1. Check runtime (Bun required)
+if ! command -v bun >/dev/null 2>&1; then
+  echo -e "${RED}❌ Bun 런타임이 감지되지 않았습니다.${NC}"
+  echo "ax-onboarding은 빠르고 안전한 TypeScript 네이티브 구동을 위해 Bun을 사용합니다."
   echo "Bun 간편 설치: curl -fsSL https://bun.sh/install | bash"
   exit 1
 fi
 
-echo -e "${GREEN}✓ 런타임 확인: $RUNNER ($(command -v $RUNNER))${NC}"
+echo -e "${GREEN}✓ 런타임 확인: bun $(bun --version)${NC}"
 
 # 2. Determine installation source / directory
 AX_CACHE_DIR="$HOME/.ax/.cache/repo"
@@ -62,10 +57,5 @@ fi
 # 3. Launch interactive CLI onboarding wizard
 echo -e "\n${BOLD}🎯 온보딩 인터뷰 위저드를 실행합니다...${NC}\n"
 
-if [ "$RUNNER" = "bun" ]; then
-  exec < /dev/tty
-  bun run "$INSTALL_DIR/src/cli.ts" "$@"
-else
-  exec < /dev/tty
-  node --loader ts-node/esm "$INSTALL_DIR/src/cli.ts" "$@" 2>/dev/null || node "$INSTALL_DIR/bin/ax-onboard.mjs" "$@"
-fi
+exec < /dev/tty
+bun run "$INSTALL_DIR/src/cli.ts" "$@"

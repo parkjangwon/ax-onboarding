@@ -20,6 +20,10 @@ export class RunbookInjector {
       for (const file of files) {
         const srcPath = path.join(templatesDir, file);
         const destPath = path.join(destDir, file);
+        // Do not overwrite user-owned runbooks
+        if (fs.existsSync(destPath)) {
+          continue;
+        }
         fs.copyFileSync(srcPath, destPath);
         createdFiles.push(destPath);
       }

@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 export interface DiscoveredSkill {
   packageId: string;
@@ -13,9 +13,13 @@ export class SkillFinder {
    */
   static search(query: string, maxResults = 3): DiscoveredSkill[] {
     try {
-      const output = execSync(`npx skills find "${query}" 2>/dev/null`, {
+      const sanitized = query.replace(/[^a-zA-Z0-9가-힣\s_-]/g, '').trim();
+      if (!sanitized) return [];
+
+      const output = execFileSync('npx', ['skills', 'find', sanitized], {
         encoding: 'utf-8',
-        timeout: 10000
+        timeout: 10000,
+        stdio: ['ignore', 'pipe', 'ignore']
       });
 
       return this.parseOutput(output).slice(0, maxResults);
@@ -28,6 +32,7 @@ export class SkillFinder {
   static parseOutput(rawText: string): DiscoveredSkill[] {
     const lines = rawText.split('\n');
     const results: DiscoveredSkill[] = [];
+    const packageIdRegex = /^[a-zA-Z0-9_.-]+(\/[a-zA-Z0-9_.-]+)?@[a-zA-Z0-9_.-]+$/;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -35,6 +40,7 @@ export class SkillFinder {
       if (line.includes('@') && !line.startsWith('└') && !line.startsWith('Install with')) {
         const parts = line.split(/\s+/);
         const packageId = parts[0];
+        if (!packageIdRegex.test(packageId)) continue;
         const installs = parts.slice(1).join(' ');
 
         // Check next line for URL

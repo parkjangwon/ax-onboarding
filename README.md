@@ -7,7 +7,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/parkjangwon/ax-onboarding/actions/workflows/ci.yml/badge.svg)](https://github.com/parkjangwon/ax-onboarding/actions/workflows/ci.yml)
-[![Runtime: Bun / Node](https://img.shields.io/badge/Runtime-Bun%20%2F%20Node-black.svg)]()
+[![Runtime: Bun](https://img.shields.io/badge/Runtime-Bun-black.svg)]()
 [![Protocol: MCP](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol-orange.svg)]()
 [![Compatible: Claude | Antigravity | Codex | Cursor](https://img.shields.io/badge/Agents-Claude%20%7C%20Antigravity%20%7C%20Codex%20%7C%20Cursor-purple.svg)]()
 

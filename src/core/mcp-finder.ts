@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 export interface DiscoveredMcp {
   id: string;
@@ -14,9 +14,13 @@ export class McpFinder {
    */
   static search(query: string, maxResults = 3): DiscoveredMcp[] {
     try {
-      const output = execSync(`npx -y @smithery/cli mcp search "${query}" 2>/dev/null`, {
+      const sanitized = query.replace(/[^a-zA-Z0-9가-힣\s_-]/g, '').trim();
+      if (!sanitized) return [];
+
+      const output = execFileSync('npx', ['-y', '@smithery/cli', 'mcp', 'search', sanitized], {
         encoding: 'utf-8',
-        timeout: 10000
+        timeout: 10000,
+        stdio: ['ignore', 'pipe', 'ignore']
       });
 
       return this.parseOutput(output).slice(0, maxResults);

@@ -189,6 +189,15 @@ describe('RunbookInjector & Preflight', () => {
     expect(fs.existsSync(path.join(tempDir, 'runbooks', '02-customer-inquiry.md'))).toBe(true);
     expect(fs.existsSync(path.join(tempDir, 'runbooks', '05-security-audit.md'))).toBe(true);
 
+    // Verify non-destructive behavior: existing runbook is NOT overwritten
+    const customContent = '# My Custom User Runbook';
+    const customPath = path.join(tempDir, 'runbooks', '01-troubleshoot.md');
+    fs.writeFileSync(customPath, customContent, 'utf-8');
+
+    const secondInject = RunbookInjector.inject(tempDir);
+    expect(secondInject.includes(customPath)).toBe(false);
+    expect(fs.readFileSync(customPath, 'utf-8')).toBe(customContent);
+
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 

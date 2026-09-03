@@ -110,6 +110,11 @@ export interface AXBlueprint {
     organization: string;
     agentEnvironment: AgentEnvironment;
   };
+  /** Raw interview answers preserved for downstream agents and SKILL.md analysis */
+  interviewRaw?: {
+    routineAnswers: string[];
+    painPointAnswers: string[];
+  };
   detectedArchetype: string;
   appliedAddon?: string;
   groundRules: string[];

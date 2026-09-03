@@ -105,6 +105,10 @@ export class TaskAnalyzer {
         organization: interview.organization,
         agentEnvironment: interview.agentEnvironment
       },
+      interviewRaw: {
+        routineAnswers: interview.routineAnswers || [],
+        painPointAnswers: interview.painPointAnswers || []
+      },
       detectedArchetype: archetype.name,
       appliedAddon: addon?.name,
       groundRules,
