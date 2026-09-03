@@ -45,12 +45,18 @@ Core 엔진은 **100% 순수 오픈소스**로 공개되며, 회사나 조직별
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        Agent Adapter Layer                             │
 │                                                                        │
-│  • Claude Code   : ~/.claude.json 패치, CLAUDE.md 생성, background job │
-│  • Antigravity   : AGENTS.md 작업 규약 계약서 생성, schedule 루틴 연동 │
-│  • Claude Desktop: claude_desktop_config.json 자동 주입 (비개발직군)   │
-│  • Generic       : 범용 AGENTS.md + CLAUDE.md 통합 생성                │
+│  • Global Scope   : 사용자 홈 디렉토리(~/.ax 및 Windows %USERPROFILE%\.ax)     │
+│  • Claude Code    : ~/.claude.json 패치, ~/.claude/CLAUDE.md 전역 링크        │
+│  • Antigravity    : ~/.ax/AGENTS.md 전역 작업 규약 및 런북 주입              │
+│  • Claude Desktop : claude_desktop_config.json 전역 MCP 주입 (비개발직군)    │
+│  • Multi-Project  : 어떤 폴더, 어떤 레포지토리, 어떤 워크트리에서도 자동 활성화 │
 └────────────────────────────────────────────────────────────────────────┘
 ```
+
+> **💡 크로스 플랫폼 & 전역(Global) 프로젝트 보장**  
+> `ax-onboarding`은 특정 로컬 프로젝트 폴더에 갇히지 않습니다.  
+> **macOS, Linux, Windows를 완벽 지원**하며 사용자 홈 디렉토리(`~/.ax`, `%USERPROFILE%\.ax`)에 전역으로 설치되어,  
+> 사용자가 터미널에서 어떤 저장소나 폴더로 이동하더라도 에이전트가 동일한 런북, 보안 규약, MCP 도구를 그대로 사용할 수 있습니다.
 
 ---
 
