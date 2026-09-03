@@ -1,114 +1,113 @@
 # 🚀 Universal AX Onboarding Framework (`ax-onboarding`)
 
-> **"개인의 일상 업무가 AX(선행 DX 포함)되지 않은 상태에서 과업의 결과물에 AI를 결합하려는 시도는 사상누각이다."**  
-> 출근부터 퇴근까지의 일상 루틴을 1:1 심층 인터뷰로 진단하고, 에이전트 환경(MCP, 스킬, 작업 규약, 스케줄링)을 원클릭으로 세팅해 주는 **범용 AX(AI Transformation) 온보딩 프레임워크**
+[English](README.md) | [한국어](README.ko.md)
+
+> **"Attempting to graft AI onto business deliverables without first transforming an individual's day-to-day work routines (AX preceded by DX) is a house built on sand."**  
+> An enterprise-grade, agent-agnostic onboarding framework that decomposes your daily commute-to-leave routines through interactive diagnosis, and provisions a production-ready agentic harness (MCPs, community skills, security rules, and executable runbooks) with a single click.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Runtime: Bun/Node](https://img.shields.io/badge/Runtime-Bun%20%2F%20Node-black.svg)]()
+[![Runtime: Bun / Node](https://img.shields.io/badge/Runtime-Bun%20%2F%20Node-black.svg)]()
 [![Protocol: MCP](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol-orange.svg)]()
-[![Compatible: Claude%20%7C%20Antigravity%20%7C%20Codex](https://img.shields.io/badge/Agents-Claude%20%7C%20Antigravity%20%7C%20Codex-purple.svg)]()
+[![Compatible: Claude | Antigravity | Codex | Cursor](https://img.shields.io/badge/Agents-Claude%20%7C%20Antigravity%20%7C%20Codex%20%7C%20Cursor-purple.svg)]()
 
 ---
 
-## 📌 왜 `ax-onboarding`인가? (Why AX Onboarding?)
+## 📌 Why `ax-onboarding`?
 
-많은 기업들이 거창하게 전사 AI 도입을 외치지만 실패하는 이유는 명확합니다:
-1. **탑다운(Top-down) AI 쇼잉의 한계**: 실무자 개개인이 매일 손발처럼 쓰는 업무에서 AI와 호흡을 맞춰보지 않았는데, 비즈니스 결과물에 억지로 AI를 붙이려 하니 겉도는 결과물만 양산됩니다.
-2. **추상화의 벽**: "AI가 좋다는데, 당장 오늘 내 출근 후 업무에 어떻게 써야 하지?"에 대한 구체적인 답을 찾지 못합니다.
-3. **설치 및 보안의 허들**: MCP 서버 설정, 환경 변수, 안전 규정(READONLY 원칙 등)을 설정하다가 기술적 장벽에 부딪혀 포기합니다.
+Across the tech industry, enterprise AI transformation (AX) initiatives consistently fail for three fundamental reasons:
 
-`ax-onboarding`은 **"출근해서 모니터를 켜고 퇴근할 때까지 하는 모든 일"**을 인터뷰하여, AI 에이전트가 대신하거나 가속할 수 있는 영역을 Before/After 청사진으로 도출하고 로컬 머신에 필요한 도구를 **원클릭(Zero-Friction)**으로 프로비저닝합니다.
+1. **The Trap of "Top-Down AI Showing"**: Organizations push for AI-powered features in customer-facing products while their internal staff have never experienced continuous, natural AI collaboration in their own daily work (issue triaging, log analysis, report drafting, data reconciliation).
+2. **The Abstraction Wall**: Employees hear that "AI is revolutionary," but nobody shows them how it applies to *what they do immediately after turning on their monitors at 9 AM*.
+3. **The Setup & Security Barrier**: Connecting Model Context Protocol (MCP) servers, managing sensitive credentials, configuring strict database read-only gates, and writing robust execution contracts (`CLAUDE.md` / `AGENTS.md`) is too complex for most practitioners.
+
+`ax-onboarding` bridges this gap. It acts as an **Agentic Harness Factory**: it conducts a structured 1:1 interview of your daily commute-to-leave routine, generates a tangible Before-vs-After AX Blueprint, dynamically pulls verified tools from `skills.sh` and `Smithery.ai`, and provisions a rock-solid, cross-platform global harness.
 
 ---
 
-## 🏗️ 시스템 아키텍처 (Architecture)
+## 🏗️ Architecture
 
-Core 엔진은 **100% 순수 오픈소스**로 공개되며, 회사나 조직별 보안 수칙/내부 GitLab/사내 MCP 등은 **외부 플러그형 애드온(Addon)**으로 주입됩니다.
+The core engine is **100% open source and organization-agnostic**. Company-specific guidelines, internal GitLab remotes, proprietary plugins, and strict compliance rules are injected externally via **Pluggable Addons**.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │                   Universal AX Onboarding Core Engine                  │
 │                                                                        │
-│  [1. 출퇴근 루틴 인터뷰] ──► [2. 업무 분해 및 AX 기회 진단] ──► [3. 청사진 생성]  │
+│  [1. Daily Routine Intake] ──► [2. Task Decomposition] ──► [3. AX Blueprint] │
 └───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Addon Injection (외부 주입)
+                                    │ Addon Injection (Pluggable)
                                     ▼
         ┌────────────────────────────────────────────────────────┐
         │             Organization / Enterprise Addon            │
-        │   (예: acme-enterprise-addon.json, store-addon.json) │
-        │   • 사내 보안 규정 (READONLY DB 원칙, SSH 승인 모드)    │
-        │   • 내부 VCS/도구 (사내 GitLab, 사내 플러그인 연동)      │
-        │   • 조직 전용 MCP 서버 및 추천 규칙 주입               │
+        │   (e.g., acme-enterprise-addon.json, store-pack)    │
+        │   • Enterprise ground-rules (Mandatory DB READONLY)    │
+        │   • Internal VCS & CI/CD (GitLab 4-Phase workflows)    │
+        │   • Private MCP catalog & pre-approved toolchains      │
         └───────────────────────────┬────────────────────────────┘
-                                    │ Provisioning (환경별 자동 세팅)
+                                    │ Automated Provisioning
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│                        Agent Adapter Layer                             │
+│                   Cross-Platform Global Harness Layer                  │
 │                                                                        │
-│  • Global Scope   : 사용자 홈 디렉토리(~/.ax 및 Windows %USERPROFILE%\.ax)     │
-│  • Claude Code    : ~/.claude.json 패치, ~/.claude/CLAUDE.md 전역 링크        │
-│  • Antigravity    : ~/.ax/AGENTS.md 전역 작업 규약 및 런북 주입              │
-│  • Claude Desktop : claude_desktop_config.json 전역 MCP 주입 (비개발직군)    │
-│  • Multi-Project  : 어떤 폴더, 어떤 레포지토리, 어떤 워크트리에서도 자동 활성화 │
+│  • Global Scope   : User Home Directory (~/.ax and %USERPROFILE%\.ax)  │
+│  • Claude Code    : ~/.claude.json patched & ~/.claude/CLAUDE.md link  │
+│  • Antigravity    : ~/.ax/AGENTS.md universal agent operational rules  │
+│  • Claude Desktop : claude_desktop_config.json auto-injected (GUI)     │
+│  • Runbooks       : 5 production runbooks injected to ~/.ax/runbooks/  │
+│  • Multi-Project  : Active across all repositories, worktrees & paths  │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-> **💡 크로스 플랫폼 & 전역(Global) 프로젝트 보장**  
-> `ax-onboarding`은 특정 로컬 프로젝트 폴더에 갇히지 않습니다.  
-> **macOS, Linux, Windows를 완벽 지원**하며 사용자 홈 디렉토리(`~/.ax`, `%USERPROFILE%\.ax`)에 전역으로 설치되어,  
-> 사용자가 터미널에서 어떤 저장소나 폴더로 이동하더라도 에이전트가 동일한 런북, 보안 규약, MCP 도구를 그대로 사용할 수 있습니다.
-
 ---
 
-## 👥 지원하는 직군 아키타입 (Role Archetypes)
+## 👥 Supported Role Archetypes
 
-IT 엔지니어뿐만 아니라, 컴퓨터와 데이터를 마주하는 모든 직업을 포괄합니다.
+Not limited to software engineers. `ax-onboarding` supports anyone who works with data, computers, and recurring tasks:
 
-| 직군 카테고리 | 대상 직무 예시 | 주요 에이전틱 전환 영역 (AX Scope) |
+| Archetype | Target Roles | Core AX Scope |
 |---|---|---|
-| **Tech Engineer** | 백엔드, 프론트엔드, DevOps, 인프라 | 서버 로그/스택트레이스 즉각 분석, READONLY DB 연동 트러블슈팅, GitLab 4-Phase 워크플로우, 주간보고 자동화 |
-| **Business Office** | 기획, 마케팅, 인사, 회계, 총무 | 엑셀 정산 데이터 대조 및 이상치 검출, 아침 8시 30분 경쟁사 뉴스 브리핑 루틴, 회의록 기반 액션아이템 구조화 |
-| **Commerce Merchant** | 온라인 쇼핑몰, 소상공인, 셀러 | 다채널(스마트스토어, 쿠팡) 주문 엑셀 자동 통합, 송장 번호 서식 변환, 고객 리뷰 감성 분석 및 정중한 답변 생성 |
-| **Culinary & F&B** | 레스토랑 셰프, 식당/카페 운영자 | 실시간 식자재 시세 반영 메뉴 원가율 계산, 예약 인원 기반 당일 식자재 발주 권고서, 주방 인쇄용 1장 표준 레시피(SOP) |
-| **General** | 프리랜서, 1인 기업가, 범용 사무직 | 직무 불문 1:1 문진표 기반 맞춤형 워크플로우 생성 |
+| **Tech Engineer** | Backend, Frontend, DevOps, SRE, QA | Incident log & stack-trace tracing, READONLY DB inspection, safe backward-compatible patches, GitLab 4-Phase MR workflows |
+| **Business Office** | PM, Marketing, HR, Finance, Operations | Multi-sheet Excel diffing & anomaly detection, 8:30 AM automated competitor briefing, meeting-notes-to-action-item synthesis |
+| **Commerce Merchant** | E-commerce sellers, SmartStore, Coupang | Multi-channel order sheet merging, courier invoice formatting, customer review sentiment analysis & polite response drafting |
+| **Culinary & F&B** | Restaurant chefs, Cafe operators, F&B managers | Real-time ingredient cost & recipe margin recalculation, weather/reservation-based daily prep orders, kitchen 1-page standard SOPs |
+| **General** | Freelancers, creators, general practitioners | Custom 1:1 questionnaire-based routine automation |
 
 ---
 
-## 🏢 기업/조직 애드온 (Enterprise Addon System)
+## 🦾 Dynamic Dual Discovery (Brain + Limbs)
 
-특정 기업의 독자적인 보안 수칙, 내부 인트라넷 URL, 전용 GitLab 환경 등을 오픈소스 코어에 하드코딩하지 않고 표준 JSON 스펙으로 주입할 수 있습니다.
-
-```json
-{
-  "addonId": "acme-enterprise-addon",
-  "name": "Acme Enterprise Solution Addon",
-  "organization": "Acme (ACME)",
-  "version": "1.0.0",
-  "groundRules": [
-    "보안 최우선 원칙: 외부 DB 접속 시 반드시 READONLY 계정을 별도 생성하여 설정할 것",
-    "SSH 원격 명령 실행 시 파괴적 명령어(rm, drop 등)는 사용자 수동 승인 필수",
-    "사내 GitLab 4-Phase 파이프라인 준수"
-  ],
-  "mcpCatalog": [
-    {
-      "id": "mariadb-readonly",
-      "name": "사내 DB READONLY MCP",
-      "type": "stdio",
-      "command": "uv",
-      "args": ["run", "src/server.py"],
-      "safetyLevel": "readonly"
-    }
-  ]
-}
-```
+To avoid hardcoding thousands of specialized domain tools:
+- **🧠 Brain (Skills)**: Queries `skills.sh` (`npx skills find`) to find high-install community guides, review skills, and workflow templates.
+- **🦾 Limbs (MCP Servers)**: Queries `Smithery.ai` (`@smithery/cli mcp search`) to discover real external tools (DB connectors, SSH shells, browser automation, S3, Slack).
 
 ---
 
-## ⚡ 원라인 간편 설치 및 클린 삭제 (One-Line Install & Clean Uninstall)
+## 📚 5 Production Runbooks Injected (`runbooks/`)
 
-### 📥 원라인 설치 (One-Line Install)
+During setup, executable markdown runbooks are generated directly in your global home (`~/.ax/runbooks/`):
 
-터미널에서 한 줄만 실행하면 의존성 확인부터 글로벌 셋업까지 즉시 진행됩니다.
+1. `01-troubleshoot.md`: Step-by-step incident response from SSH logs to code line pinpointing and non-breaking patch proposals.
+2. `02-customer-inquiry.md`: Bug reproduction and generation of formal 3-tier customer feedback reports (*Symptoms - Root Cause - Resolution*).
+3. `03-safe-patch.md`: Conservative bug fixing respecting backward compatibility and team VCS branch/MR conventions.
+4. `04-browser-e2e.md`: Headless/visual browser automation with Playwright to capture console errors and UI regressions.
+5. `05-security-audit.md`: Pre-commit static audit for hardcoded secrets, OWASP vulnerabilities, and plaintext PII logging.
+
+Users trigger them naturally:
+> `👉 @~/.ax/runbooks/01-troubleshoot.md Investigate the 3 PM batch failure`
+
+---
+
+## 🛡️ Enterprise-Grade Security & Isolation
+
+- **Mandatory DB READONLY Gate**: Rejects administrator accounts (`root`, `admin`, `sa`). Requires a dedicated read-only database user (`GRANT SELECT`).
+- **Zero-Leak Credential Storage**: Sensitive credentials are saved to `~/.ax/.env.mcp` with strict `chmod 600` permissions and automatically appended to `.gitignore`. No secrets are ever committed.
+- **Guarded Commands**: Prohibits destructive commands (`rm -rf`, `drop database`, `reboot`) without explicit interactive user approval.
+
+---
+
+## ⚡ One-Line Install & Clean Uninstall
+
+### 📥 One-Line Install
+Run in your terminal to begin the interactive diagnosis and global harness setup:
 
 **macOS / Linux**:
 ```bash
@@ -120,12 +119,8 @@ curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/i
 irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.ps1 | iex
 ```
 
----
-
-### 🧹 원라인 클린 삭제 (One-Line Clean Uninstall)
-
-설치 후 마음에 들지 않거나 초기 상태로 되돌리고 싶을 때, **시스템에 단 1byte의 찌꺼기도 남기지 않고 완벽하게 원상복구**합니다.
-언제든 다시 클린 셋업할 수 있도록 보장합니다.
+### 🧹 One-Line Clean Uninstall
+Restores your system to a pristine, 100% untouched state without leaving a single orphaned byte:
 
 **macOS / Linux**:
 ```bash
@@ -137,48 +132,45 @@ curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/u
 irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.ps1 | iex
 ```
 
-> **🛡️ 클린 삭제 보장 내역:**
-> 1. 백업된 원본 `~/.claude.json`으로 무손실 원상 복원
-> 2. `~/.claude/CLAUDE.md` 내 AX 연결 라인만 선택적 안전 제거 (기존 사용자 개인 규칙 100% 보존)
-> 3. 전역 `~/.ax` 디렉터리 (런북, 인증정보, 캐시) 완전 삭제
+> **Clean Uninstall Guarantee:**
+> - Lossless restoration of `~/.claude.json` from backup.
+> - Preserves 100% of existing user rules in `~/.claude/CLAUDE.md`, safely unlinking only the AX line.
+> - Completely wipes `~/.ax` (runbooks, credentials, cache).
 
 ---
 
-## 🚀 빠른 시작 (Quick Start - 로컬 레포지토리)
+## 🚀 Alternative Usage Methods
 
-### 방법 1. 대화형 터미널 위저드 실행 (CLI)
-
+### Method 1: Local CLI Wizard
 ```bash
-# Bun을 사용하는 경우
-bun start
-
-# 또는 Node를 사용하는 경우
-npm start
-
-# 즉시 롤백/원상복구가 필요한 경우
-bun start --rollback
+bun start          # or: npm start
+bun start --rollback # to clean up
 ```
 
-### 방법 2. 에이전트 스킬로 실행 (`SKILL.md`)
+### Method 2: Agent-Native (`SKILL.md` or GitHub URL)
+Simply hand this repository URL to your AI agent (Claude Desktop, Cursor, Antigravity, ChatGPT):
+> *"Read https://github.com/acme/ax-onboarding and onboard me to an agentic workflow."*
 
-Claude Code, Antigravity, Codex 등의 에이전트 환경에서 직접 스킬로 호출할 수 있습니다.
-* 명령어: `/ax-onboard` (또는 `"AX 온보딩 시작해줘"`)
-* 에이전트가 1:1 컨설턴트 페르소나로 전환하여 대화형 인터뷰와 자동 프로비저닝을 주도합니다.
+The agent parses `SKILL.md` and drives the 1:1 interview conversationally in chat.
 
 ---
 
-## 🧪 테스트 실행
+## 🧪 Automated Tests
 
 ```bash
 bun test
 ```
-* 직군 아키타입 매칭 검증
-* 기업/상인 애드온 스키마 유효성 테스트
-* 테스크 분석 및 청사진 생성 검증
-* 에이전트 어댑터 로컬 파일 생성(CLAUDE.md / AGENTS.md) 검증
+- Archetype matching & routing
+- Enterprise Addon schema validation
+- Live skill & MCP registry parsers
+- Credential isolation & DB security validation
+- Runbook injection, healthchecks, and rollback mechanics
+- Cross-platform path resolution
+
+*(14 unit tests, 100% passing)*
 
 ---
 
-## 📄 라이선스 (License)
+## 📄 License
 
 MIT License © 2026 Park Jang-won (Acme)
