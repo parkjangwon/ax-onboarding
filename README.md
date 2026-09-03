@@ -163,4 +163,4 @@ bun test
 
 ## 📄 License
 
-MIT License © 2026 Park Jang-won (Acme)
+MIT License © 2026 parkjangwon <vim@kakao.com>
