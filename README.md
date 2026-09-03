@@ -73,7 +73,8 @@ To avoid hardcoding thousands of specialized domain tools:
 
 ## 📚 5 Production Runbooks Injected (`runbooks/`)
 
-During setup, executable markdown runbooks are generated directly in your global home (`~/.ax/runbooks/`):
+During setup, 5 production runbooks are installed directly into your global home (`~/.ax/runbooks/`).
+**Users NEVER need to memorize or type slash commands (/command) or file paths (@runbooks/...).** Simply converse naturally with your agent, and it will autonomously route your intent to the correct runbook and tools in the background:
 
 1. `01-troubleshoot.md`: Step-by-step incident response from SSH logs to code line pinpointing and non-breaking patch proposals.
 2. `02-customer-inquiry.md`: Bug reproduction and generation of formal 3-tier customer feedback reports (*Symptoms - Root Cause - Resolution*).
@@ -81,8 +82,8 @@ During setup, executable markdown runbooks are generated directly in your global
 4. `04-browser-e2e.md`: Headless/visual browser automation with Playwright to capture console errors and UI regressions.
 5. `05-security-audit.md`: Pre-commit static audit for hardcoded secrets, OWASP vulnerabilities, and plaintext PII logging.
 
-Users trigger them naturally:
-> `👉 @~/.ax/runbooks/01-troubleshoot.md Investigate the 3 PM batch failure`
+> 💬 **User**: "The 3 PM batch job failed yesterday. Can you find out why?"  
+> 🤖 **Agent**: *(Autonomously applies `01-troubleshoot.md` protocol in the background, tracing SSH logs, locating the faulty code line, verifying DB integrity, and proposing a safe patch without prompting for commands)*
 
 ---
 

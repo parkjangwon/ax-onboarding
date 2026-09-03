@@ -40,6 +40,15 @@ export class AntigravityAdapter {
 ## Ground Rules
 ${rulesList}
 
+## Autonomous Intent Routing (Zero-Command Execution)
+The user will communicate using casual, conversational language. DO NOT require slash commands (/command), file path mentions (@runbooks/...), or tool names.
+Automatically map user intents to internal runbooks and tools in the background:
+- Errors, log traces, batch failures -> Apply \`~/.ax/runbooks/01-troubleshoot.md\` protocol.
+- Inquiries, user complaints -> Apply \`~/.ax/runbooks/02-customer-inquiry.md\` (Symptoms - Root Cause - Action format).
+- Bug fixes, patches -> Apply \`~/.ax/runbooks/03-safe-patch.md\` (non-breaking, conservative).
+- UI defects -> Apply \`~/.ax/runbooks/04-browser-e2e.md\` (Playwright inspection).
+- Data, sheets, stock, orders -> Call connected MCP tools silently.
+
 ## Task Delegation Matrix
 ${taskList}
 
