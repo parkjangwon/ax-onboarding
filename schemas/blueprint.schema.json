@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AXBlueprint",
+  "description": "Customized AX blueprint resulting from interview and diagnosis",
+  "type": "object",
+  "required": ["userProfile", "detectedArchetype", "tasks", "actionPlan"],
+  "properties": {
+    "userProfile": {
+      "type": "object",
+      "required": ["role", "organization"],
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "organization": { "type": "string" },
+        "agentEnvironment": { "type": "string", "enum": ["claude-code", "antigravity", "claude-desktop", "cursor", "generic"] }
+      }
+    },
+    "detectedArchetype": { "type": "string" },
+    "appliedAddon": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["taskName", "currentWorkflow", "axWorkflow", "category", "opportunityScore"],
+        "properties": {
+          "taskName": { "type": "string" },
+          "currentWorkflow": { "type": "string" },
+          "axWorkflow": { "type": "string" },
+          "category": { "type": "string", "enum": ["adhoc", "routine_daily", "routine_weekly", "co-work"] },
+          "opportunityScore": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "requiredTools": {
+            "type": "object",
+            "properties": {
+              "mcps": { "type": "array", "items": { "type": "string" } },
+              "skills": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "actionPlan": {
+      "type": "object",
+      "required": ["provisioningSteps", "day1QuickWin"],
+      "properties": {
+        "provisioningSteps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["stepNumber", "title", "actionType"],
+            "properties": {
+              "stepNumber": { "type": "integer" },
+              "title": { "type": "string" },
+              "actionType": { "type": "string", "enum": ["install_mcp", "install_skill", "create_rules", "setup_routine"] },
+              "details": { "type": "object" }
+            }
+          }
+        },
+        "day1QuickWin": {
+          "type": "object",
+          "required": ["title", "samplePrompt", "expectedResult"],
+          "properties": {
+            "title": { "type": "string" },
+            "samplePrompt": { "type": "string" },
+            "expectedResult": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

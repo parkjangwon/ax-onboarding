@@ -1,0 +1,46 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import type { AXBlueprint } from '../core/types.js';
+
+export class ClaudeDesktopAdapter {
+  static provision(blueprint: AXBlueprint): { success: boolean; modifiedFiles: string[] } {
+    const modifiedFiles: string[] = [];
+    const homeDir = os.homedir();
+    
+    // macOS config path: ~/Library/Application Support/Claude/claude_desktop_config.json
+    const configDir = path.join(homeDir, 'Library', 'Application Support', 'Claude');
+    const configPath = path.join(configDir, 'claude_desktop_config.json');
+
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+
+    let config: any = { mcpServers: {} };
+    if (fs.existsSync(configPath)) {
+      try {
+        config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        config.mcpServers = config.mcpServers || {};
+      } catch {
+        config = { mcpServers: {} };
+      }
+    }
+
+    const mcpStep = blueprint.actionPlan.provisioningSteps.find(s => s.actionType === 'install_mcp');
+    if (mcpStep && mcpStep.details?.mcps) {
+      for (const mcp of mcpStep.details.mcps) {
+        if (!config.mcpServers[mcp.id]) {
+          config.mcpServers[mcp.id] = {
+            command: mcp.command || 'npx',
+            args: mcp.args || ['-y', mcp.id],
+            env: mcp.env || {}
+          };
+        }
+      }
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+      modifiedFiles.push(configPath);
+    }
+
+    return { success: true, modifiedFiles };
+  }
+}

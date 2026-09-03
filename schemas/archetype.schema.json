@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RoleArchetype",
+  "description": "Definition of a professional role archetype with common routines and AX opportunity mappings",
+  "type": "object",
+  "required": ["id", "name", "category", "description", "routineQuestions", "commonPainPoints", "recommendedToolchain"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "category": { "type": "string", "enum": ["tech", "business", "commerce", "culinary", "general"] },
+    "description": { "type": "string" },
+    "routineQuestions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "commonPainPoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task", "currentPain", "axOpportunity"],
+        "properties": {
+          "task": { "type": "string" },
+          "currentPain": { "type": "string" },
+          "axOpportunity": { "type": "string" }
+        }
+      }
+    },
+    "recommendedToolchain": {
+      "type": "object",
+      "properties": {
+        "mcps": { "type": "array", "items": { "type": "string" } },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "routines": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

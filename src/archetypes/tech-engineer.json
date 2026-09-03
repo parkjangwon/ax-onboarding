@@ -1,0 +1,34 @@
+{
+  "id": "tech-engineer",
+  "name": "소프트웨어 엔지니어 / DevOps / 인프라",
+  "category": "tech",
+  "description": "코드 작성, 리팩토링, 서버 장애 분석, DB 쿼리, 배포 및 인프라 운영을 담당하는 기술 직군",
+  "routineQuestions": [
+    "출근 후 가장 먼저 확인하는 시스템이나 대시보드는 무엇인가요? (예: 모니터링, GitLab/GitHub 이슈, 에러 알림)",
+    "장애나 이슈 발생 시 현상 파악부터 원인 규명, 조치 보고서 작성까지의 평균 소요 시간과 병목 지점은 어디인가요?",
+    "매주/매월 반복되는 정기 작업 중 가장 번거로운 작업은 무엇인가요? (예: 주간 업무 보고, 정기 점검, 릴리즈 태깅)",
+    "서버나 DB에 접근할 수 있는 권한(SSH, DB 포트, 로컬 개발 환경)이 PC에 갖추어져 있나요?"
+  ],
+  "commonPainPoints": [
+    {
+      "task": "서버 장애 및 스택 트레이스 분석",
+      "currentPain": "SSH 접속 → 로그 grep → 스택트레이스 라인 확인 → 로컬 코드 검색 → DB 확인 등 전 과정을 수동으로 진행하여 본업 지연",
+      "axOpportunity": "SSH MCP + READONLY DB MCP + 로컬 코드 탐색을 에이전트에게 위임하여 1분 이내에 현상-원인-패치안 도출"
+    },
+    {
+      "task": "주간 업무 및 이슈 처리 보고서 작성",
+      "currentPain": "한 주 동안 머지된 커밋과 처리된 이슈를 수동으로 취합하고 정리하느라 매주 30분~1시간 소모",
+      "axOpportunity": "GitLab/GitHub 활동 내역을 수집해 정해진 템플릿의 주간보고 초안을 매주 금요일 스케줄러로 자동 생성"
+    },
+    {
+      "task": "사내 컨벤션 및 보수적 패키지 관리",
+      "currentPain": "AI에게 코딩을 시키면 사내 규칙을 무시하고 무분별하게 큰 리팩토링이나 외부 라이브러리를 끌어와서 위험함",
+      "axOpportunity": "CLAUDE.md / AGENTS.md에 사내 그라운드 룰(최소 수정 범위, 하위 호환성 원칙, 팀 컨벤션)을 주입해 안전한 코드 작성 유도"
+    }
+  ],
+  "recommendedToolchain": {
+    "mcps": ["ssh-mcp", "mariadb-readonly-mcp", "codegraph-mcp", "s3-mcp"],
+    "skills": ["git-workflow", "cso-security", "rtk-token-optimizer"],
+    "routines": ["morning-health-check", "friday-weekly-report"]
+  }
+}

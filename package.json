@@ -1,0 +1,27 @@
+{
+  "name": "ax-onboarding",
+  "version": "1.0.0",
+  "description": "Universal AX (AI Transformation) Onboarding Framework for diverse roles & enterprise addon extensibility",
+  "main": "src/index.ts",
+  "bin": {
+    "ax-onboard": "./bin/ax-onboard.mjs"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "test": "bun test"
+  },
+  "keywords": [
+    "ax",
+    "ai-transformation",
+    "agentic-workflow",
+    "onboarding",
+    "mcp",
+    "claude-code",
+    "antigravity",
+    "codex",
+    "enterprise"
+  ],
+  "author": "Park Jang-won <pjw@acme.com>",
+  "license": "MIT"
+}

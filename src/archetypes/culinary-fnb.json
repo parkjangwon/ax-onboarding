@@ -1,0 +1,34 @@
+{
+  "id": "culinary-fnb",
+  "name": "요식업 / 셰프 / 카페 및 레스토랑 운영자",
+  "category": "culinary",
+  "description": "메뉴 개발, 식자재 원가 계산, 주간/일일 발주, 위생 및 오픈/마감 체크리스트 관리, 고객 피드백 분석을 담당하는 F&B 직군",
+  "routineQuestions": [
+    "출근 후 냉장고 재고 확인 및 당일 식자재 발주서를 작성할 때 어떤 방식을 쓰시나요?",
+    "메뉴별 식자재 원가율(Cost %) 계산이나 계절별 식자재 시세 변동을 어떻게 추적하시나요?",
+    "직원/알바생을 위한 레시피 표준화(g 단위 계량, 조리 순서, 사진 가이드)가 문서로 잘 정리되어 있나요?",
+    "오픈/마감 시 위생 점검표, 설비 온도 기록표 관리가 수기로 번거롭게 이루어지고 있나요?"
+  ],
+  "commonPainPoints": [
+    {
+      "task": "식자재 시세 변동에 따른 메뉴별 실시간 원가율 계산",
+      "currentPain": "고기, 채소 가격이 급등해도 메뉴판 가격을 손대기 어렵고 실제 마진이 얼마 남는지 파악하기 어려움",
+      "axOpportunity": "거래처 식자재 매입 영수증/명세서 텍스트를 인식하여 메뉴별 원가율과 마진 기여도를 즉시 재산출"
+    },
+    {
+      "task": "당일 예약 인원 및 예상 객수 기반 식자재 발주서 생성",
+      "currentPain": "눈대중으로 발주하다가 재료가 떨어져 조기 마감하거나 남아서 폐기 처분",
+      "axOpportunity": "요일별/날씨별 판매 데이터와 예약 인원을 반영하여 최적의 식자재 발주 권장 수량 자동 산출"
+    },
+    {
+      "task": "표준 조리 레시피 카드 및 신메뉴 매뉴얼 제작",
+      "currentPain": "주방 인력이 바뀔 때마다 맛이 달라지고 교육에 셰프의 시간이 과도하게 뺏김",
+      "axOpportunity": "구두 설명이나 대략적인 재료 목록을 주방 인쇄용 1장 표준 조리 매뉴얼(SOP)로 규격화"
+    }
+  ],
+  "recommendedToolchain": {
+    "mcps": ["officecli-mcp", "ocr-receipt-mcp"],
+    "skills": ["recipe-cost-calculator", "daily-order-sheet-generator", "sop-formatter"],
+    "routines": ["morning-prep-checklist", "closing-inventory-audit"]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "addonId": "smartstore-merchant-addon",
+  "name": "SmartStore & Coupang Seller Pack",
+  "organization": "Open Commerce Alliance",
+  "version": "1.0.0",
+  "description": "네이버 스마트스토어 및 쿠팡 입점 셀러를 위한 정산, 리뷰, 송장 자동화 애드온",
+  "targetArchetypes": ["commerce-merchant"],
+  "groundRules": [
+    "고객 개인정보(수령인 이름, 전화번호, 배송지 주소)는 택배사 송장 출력 후 로컬에서 즉시 암호화 또는 비식별화 처리",
+    "리뷰 자동 답변 시 과도한 기계적 매크로 말투를 지양하고 브랜드 친화적 톤앤매너 유지",
+    "정산 금액 불일치 시 100원 단위 오차도 즉시 수동 확인 알림 발생"
+  ],
+  "securityGuidelines": [
+    "오픈마켓 API 시크릿 키는 환경 변수에만 보관하고 프롬프트나 로그에 노출 금지"
+  ],
+  "mcpCatalog": [
+    {
+      "id": "officecli-mcp",
+      "name": "Office/Excel CLI MCP",
+      "type": "stdio",
+      "command": "officecli",
+      "args": ["mcp"],
+      "safetyLevel": "safe",
+      "notes": "발주서 엑셀 병합 및 송장 번호 서식 일괄 변환"
+    }
+  ],
+  "recommendedPlugins": [
+    "humanize-korean"
+  ],
+  "customQuestions": [
+    "주로 입점해 계신 판매 채널(네이버 스마트스토어, 쿠팡, 올웨이즈 등)과 이용 중인 택배사는 어디인가요?"
+  ]
+}
