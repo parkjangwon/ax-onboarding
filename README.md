@@ -104,7 +104,47 @@ IT 엔지니어뿐만 아니라, 컴퓨터와 데이터를 마주하는 모든 �
 
 ---
 
-## 🚀 빠른 시작 (Quick Start)
+## ⚡ 원라인 간편 설치 및 클린 삭제 (One-Line Install & Clean Uninstall)
+
+### 📥 원라인 설치 (One-Line Install)
+
+터미널에서 한 줄만 실행하면 의존성 확인부터 글로벌 셋업까지 즉시 진행됩니다.
+
+**macOS / Linux**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.sh | bash
+```
+
+**Windows (PowerShell)**:
+```powershell
+irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.ps1 | iex
+```
+
+---
+
+### 🧹 원라인 클린 삭제 (One-Line Clean Uninstall)
+
+설치 후 마음에 들지 않거나 초기 상태로 되돌리고 싶을 때, **시스템에 단 1byte의 찌꺼기도 남기지 않고 완벽하게 원상복구**합니다.
+언제든 다시 클린 셋업할 수 있도록 보장합니다.
+
+**macOS / Linux**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.sh | bash
+```
+
+**Windows (PowerShell)**:
+```powershell
+irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.ps1 | iex
+```
+
+> **🛡️ 클린 삭제 보장 내역:**
+> 1. 백업된 원본 `~/.claude.json`으로 무손실 원상 복원
+> 2. `~/.claude/CLAUDE.md` 내 AX 연결 라인만 선택적 안전 제거 (기존 사용자 개인 규칙 100% 보존)
+> 3. 전역 `~/.ax` 디렉터리 (런북, 인증정보, 캐시) 완전 삭제
+
+---
+
+## 🚀 빠른 시작 (Quick Start - 로컬 레포지토리)
 
 ### 방법 1. 대화형 터미널 위저드 실행 (CLI)
 
@@ -114,13 +154,10 @@ bun start
 
 # 또는 Node를 사용하는 경우
 npm start
-```
 
-터미널에서 안내에 따라:
-1. 본인의 직무와 출퇴근 일상 루틴을 답변합니다.
-2. 시스템이 업무를 분해하고 **AX 기회 매트릭스(Before vs After)**를 제시합니다.
-3. 승인 시 로컬 에이전트 설정 파일(`CLAUDE.md`, `AGENTS.md`, MCP)을 원클릭으로 세팅합니다.
-4. 마지막으로 안내되는 **Day-1 Quick Win** 프롬프트를 에이전트에게 입력하여 즉시 성공 경험을 체감합니다.
+# 즉시 롤백/원상복구가 필요한 경우
+bun start --rollback
+```
 
 ### 방법 2. 에이전트 스킬로 실행 (`SKILL.md`)
 
