@@ -35,6 +35,24 @@ export class TaskAnalyzer {
       });
     }
 
+    // Incorporate user's actual interview pain points if mentioned
+    if (interview.painPointAnswers && interview.painPointAnswers.length > 0) {
+      for (const ans of interview.painPointAnswers) {
+        if (!ans || ans.trim().length === 0) continue;
+        tasks.push({
+          taskName: ans.trim(),
+          currentWorkflow: '수작업 수동 처리 및 컨텍스트 스위칭',
+          axWorkflow: '에이전트 배경 사전 분석 및 실시간 초안 작성 보조',
+          category: 'adhoc',
+          opportunityScore: 5,
+          requiredTools: {
+            mcps: archetype.recommendedToolchain.mcps?.slice(0, 1) || [],
+            skills: archetype.recommendedToolchain.skills?.slice(0, 1) || []
+          }
+        });
+      }
+    }
+
     // Merge ground rules
     const groundRules = [
       ...(addon?.groundRules || [
