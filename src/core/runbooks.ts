@@ -3,11 +3,12 @@ import path from 'node:path';
 
 export class RunbookInjector {
   /**
-   * Injects production runbooks into the target project directory under <targetDir>/runbooks/
+   * Injects production runbooks into global (~/.ax/runbooks/) or target directory
    */
-  static inject(targetDir: string): string[] {
+  static inject(targetDir?: string): string[] {
+    const { GlobalPaths } = require('./paths.js');
     const templatesDir = path.join(import.meta.dirname, '..', '..', 'templates', 'runbooks');
-    const destDir = path.join(targetDir, 'runbooks');
+    const destDir = targetDir ? path.join(targetDir, 'runbooks') : GlobalPaths.getGlobalRunbooksDir();
 
     if (!fs.existsSync(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });

@@ -75,6 +75,13 @@ async function main() {
   };
   const agentEnvironment = envMap[envChoice] || 'claude-code';
 
+  // Scope selection: Global (Home dir) vs Project local
+  console.log('\n적용 범위를 선택해 주세요:');
+  console.log('1: 글로벌 적용 (사용자 홈 디렉토리 ~/.ax 전역 - 모든 폴더/프로젝트에서 공통 사용) [권장]');
+  console.log('2: 현재 로컬 프로젝트 폴더만 적용 (./)');
+  const scopeChoice = (await rl.question('선택 (기본: 1): ')).trim() || '1';
+  const targetDir = scopeChoice === '2' ? process.cwd() : undefined;
+
   // Routine Interview
   console.log('\n--- 📋 출근부터 퇴근까지: 일상 루틴 인터뷰 ---');
   const routineAnswers: string[] = [];
@@ -173,7 +180,7 @@ async function main() {
     }
 
     // 2. Dispatch adapters (generates CLAUDE.md, AGENTS.md, runbooks/ etc.)
-    const result = AdapterRegistry.dispatch(agentEnvironment, blueprint);
+    const result = AdapterRegistry.dispatch(agentEnvironment, blueprint, targetDir);
 
     // 3. Optionally install discovered skills
     if (discoveredSkills.length > 0) {
@@ -194,7 +201,7 @@ async function main() {
     // 4. Preflight Health Check
     console.log('\n🏥 [Pre-flight 헬스체크] 가동 상태 및 보안 격리 점검 중...');
     const { PreflightHealthCheck } = await import('./core/healthcheck.js');
-    const healthChecks = PreflightHealthCheck.runAll(process.cwd());
+    const healthChecks = PreflightHealthCheck.runAll(targetDir);
     healthChecks.forEach(hc => {
       const badge = hc.securityLevel === 'PASSED' ? '✅' : hc.securityLevel === 'WARNING' ? '⚠️ ' : '❌';
       console.log(` ${badge} ${hc.name}: ${hc.message}`);

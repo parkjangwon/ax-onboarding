@@ -3,16 +3,20 @@ import path from 'node:path';
 import type { AXBlueprint } from '../core/types.js';
 
 export class AntigravityAdapter {
-  static provision(blueprint: AXBlueprint, targetDir = process.cwd()): { success: boolean; modifiedFiles: string[] } {
+  static provision(blueprint: AXBlueprint, targetDir?: string): { success: boolean; modifiedFiles: string[] } {
+    const { GlobalPaths } = require('../core/paths.js');
     const modifiedFiles: string[] = [];
 
-    // 1. Generate AGENTS.md
-    const agentsMdPath = path.join(targetDir, 'AGENTS.md');
+    // 1. Generate Global or Project-local AGENTS.md
+    const agentsMdPath = targetDir 
+      ? path.join(targetDir, 'AGENTS.md')
+      : GlobalPaths.getGlobalAgentsMdPath();
+
     const content = this.generateAgentsMd(blueprint);
     fs.writeFileSync(agentsMdPath, content, 'utf-8');
     modifiedFiles.push(agentsMdPath);
 
-    // 2. Inject production runbooks into targetDir/runbooks
+    // 2. Inject production runbooks
     const { RunbookInjector } = require('../core/runbooks.js');
     const runbookFiles = RunbookInjector.inject(targetDir);
     modifiedFiles.push(...runbookFiles);

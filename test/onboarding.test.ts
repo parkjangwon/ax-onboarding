@@ -208,3 +208,24 @@ describe('RollbackManager', () => {
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 });
+
+describe('Cross-Platform: GlobalPaths', () => {
+  it('should resolve user home directory and global AX paths seamlessly', () => {
+    const { GlobalPaths } = require('../src/core/paths.js');
+    const home = GlobalPaths.getHomeDir();
+    expect(home.length).toBeGreaterThan(0);
+
+    const axHome = GlobalPaths.getAxHome();
+    expect(axHome).toContain('.ax');
+    expect(fs.existsSync(axHome)).toBe(true);
+
+    const runbooksDir = GlobalPaths.getGlobalRunbooksDir();
+    expect(runbooksDir).toContain('runbooks');
+
+    const envPath = GlobalPaths.getGlobalEnvPath();
+    expect(envPath).toContain('.env.mcp');
+
+    const claudeMd = GlobalPaths.getGlobalClaudeMdPath();
+    expect(claudeMd).toContain('CLAUDE.md');
+  });
+});

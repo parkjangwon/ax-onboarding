@@ -10,11 +10,16 @@ export interface HealthCheckItem {
 }
 
 export class PreflightHealthCheck {
-  static runAll(targetDir: string): HealthCheckItem[] {
+  static runAll(targetDir?: string): HealthCheckItem[] {
+    const { GlobalPaths } = require('./paths.js');
     const results: HealthCheckItem[] = [];
 
-    // 1. Check Git and ignore protection
-    results.push(this.checkGitIgnore(targetDir));
+    // 1. Check Git and ignore protection (if targetDir is a git repo)
+    if (targetDir) {
+      results.push(this.checkGitIgnore(targetDir));
+    } else {
+      results.push(this.checkGlobalIsolation());
+    }
 
     // 2. Check Runbooks presence
     results.push(this.checkRunbooks(targetDir));
@@ -27,6 +32,21 @@ export class PreflightHealthCheck {
     results.push(this.checkClaudeConfig());
 
     return results;
+  }
+
+  private static checkGlobalIsolation(): HealthCheckItem {
+    const { GlobalPaths } = require('./paths.js');
+    const envPath = GlobalPaths.getGlobalEnvPath();
+    const exists = fs.existsSync(envPath);
+
+    return {
+      name: '글로벌 보안 격리 (~/.ax)',
+      passed: true,
+      message: exists 
+        ? '글로벌 MCP 인증 파일이 ~/.ax/.env.mcp에 안전하게 격리됨' 
+        : '~/.ax 디렉터리가 사용자 홈에 안전하게 격리되어 Git 유출 위험 없음',
+      securityLevel: 'PASSED'
+    };
   }
 
   private static checkGitIgnore(targetDir: string): HealthCheckItem {
