@@ -12,6 +12,15 @@
 
 ---
 
+> ⚠️ **Notice: Run with Local Agents, NOT Sandboxed Cloud Web Chats (claude.ai, chatgpt.com)**  
+> `ax-onboarding` provisions tools (MCP), executable runbooks, and credentials directly onto your local machine and internal networks.  
+> Isolated cloud web chats cannot access your local OS, filesystem, or configuration files. Please run within a **Local Agent Environment**:  
+> - **Recommended for Non-Engineers & Office Staff**: [Claude Desktop App](https://claude.ai/download) (GUI + Local MCP Support)  
+> - **For Engineers & Terminal Users**: Claude Code (CLI), Codex, Cursor, Windsurf  
+> - **Integrated Agentic IDEs**: Google Antigravity, VS Code Agent Extensions
+
+---
+
 ## 📌 Why `ax-onboarding`?
 
 Across the tech industry, enterprise AI transformation (AX) initiatives consistently fail for three fundamental reasons:
