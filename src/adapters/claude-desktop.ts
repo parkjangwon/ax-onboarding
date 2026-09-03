@@ -28,6 +28,7 @@ export class ClaudeDesktopAdapter {
 
     const mcpStep = blueprint.actionPlan.provisioningSteps.find(s => s.actionType === 'install_mcp');
     if (mcpStep && mcpStep.details?.mcps) {
+      let addedAny = false;
       for (const mcp of mcpStep.details.mcps) {
         if (!config.mcpServers[mcp.id]) {
           config.mcpServers[mcp.id] = {
@@ -35,10 +36,18 @@ export class ClaudeDesktopAdapter {
             args: mcp.args || ['-y', mcp.id],
             env: mcp.env || {}
           };
+          addedAny = true;
         }
       }
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
-      modifiedFiles.push(configPath);
+      if (addedAny) {
+        // Timestamped backup before first write so rollback can restore the original
+        if (fs.existsSync(configPath)) {
+          const backupPath = `${configPath}.bak_axonboard.${Date.now()}`;
+          fs.writeFileSync(backupPath, fs.readFileSync(configPath));
+        }
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+        modifiedFiles.push(configPath);
+      }
     }
 
     return { success: true, modifiedFiles };

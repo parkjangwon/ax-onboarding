@@ -198,6 +198,15 @@ describe('RunbookInjector & Preflight', () => {
     expect(checks.length).toBeGreaterThanOrEqual(3);
     expect(checks.some(c => c.name.includes('Git'))).toBe(true);
   });
+
+  it('should NOT crash in global mode (undefined targetDir) — regression for path.join(undefined)', () => {
+    const { PreflightHealthCheck } = require('../src/core/healthcheck.js');
+    let checks;
+    expect(() => { checks = PreflightHealthCheck.runAll(undefined); }).not.toThrow();
+    expect(checks.length).toBeGreaterThanOrEqual(3);
+    // Global mode must report the runbooks check without throwing
+    expect(checks.some(c => c.name.includes('런북'))).toBe(true);
+  });
 });
 
 describe('RollbackManager', () => {
@@ -230,6 +239,56 @@ describe('RollbackManager', () => {
     expect(fs.existsSync(path.join(tempDir, 'runbooks'))).toBe(false);
 
     fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it('global rollback should preserve user-owned custom files in ~/.ax (not rm -rf whole dir)', () => {
+    const { execSync } = require('node:child_process');
+    const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-home-'));
+    try {
+      // Set up a fake ~/.ax exactly as a user would: tool artifacts + a user-owned file
+      const axDir = path.join(fakeHome, '.ax');
+      const runbooksDir = path.join(axDir, 'runbooks');
+      fs.mkdirSync(runbooksDir, { recursive: true });
+      fs.writeFileSync(path.join(axDir, 'CLAUDE.md'), '# AX constitution\n');
+      fs.writeFileSync(path.join(runbooksDir, '01-troubleshoot.md'), '# runbook\n');
+      // User-owned file that MUST survive rollback
+      const userFile = path.join(axDir, 'my-custom-credentials.json');
+      fs.writeFileSync(userFile, '{"note":"user owned"}');
+      // User-owned top-level dir that MUST survive
+      const userDir = path.join(axDir, 'custom-backups');
+      fs.mkdirSync(userDir, { recursive: true });
+      fs.writeFileSync(path.join(userDir, 'data.txt'), 'keep me');
+
+      const script = `
+        import { RollbackManager } from './src/core/rollback.ts';
+        const res = RollbackManager.rollback();
+        console.log(JSON.stringify(res));
+      `;
+      // Write the script inside the project root so relative ./src imports resolve
+      const scriptPath = path.join(process.cwd(), '.rollback-test-tmp.ts');
+      fs.writeFileSync(scriptPath, script);
+      try {
+        const out = execSync(`HOME=${JSON.stringify(fakeHome)} bun ${JSON.stringify(scriptPath)}`, {
+          cwd: process.cwd(),
+          encoding: 'utf-8'
+        });
+        const res = JSON.parse(out.trim().split('\n').pop());
+
+        // Tool artifacts removed
+        expect(fs.existsSync(path.join(axDir, 'CLAUDE.md'))).toBe(false);
+        expect(fs.existsSync(runbooksDir)).toBe(false);
+        expect(res.deletedFiles.some(f => f.includes('runbooks'))).toBe(true);
+
+        // User-owned files preserved
+        expect(fs.existsSync(userFile)).toBe(true);
+        expect(fs.existsSync(path.join(userDir, 'data.txt'))).toBe(true);
+        expect(res.deletedFiles.some(f => f.includes('custom-backups'))).toBe(false);
+      } finally {
+        fs.rmSync(scriptPath, { force: true });
+      }
+    } finally {
+      fs.rmSync(fakeHome, { recursive: true, force: true });
+    }
   });
 });
 

@@ -73,15 +73,27 @@ export class PreflightHealthCheck {
     };
   }
 
-  private static checkRunbooks(targetDir: string): HealthCheckItem {
-    const runbooksDir = path.join(targetDir, 'runbooks');
-    const exists = fs.existsSync(runbooksDir) && fs.readdirSync(runbooksDir).length > 0;
+  private static checkRunbooks(targetDir?: string): HealthCheckItem {
+    const { GlobalPaths } = require('./paths.js');
+    const runbooksDir = targetDir
+      ? path.join(targetDir, 'runbooks')
+      : GlobalPaths.getGlobalRunbooksDir();
+
+    let count = 0;
+    if (fs.existsSync(runbooksDir)) {
+      try {
+        count = fs.readdirSync(runbooksDir).length;
+      } catch {
+        count = 0;
+      }
+    }
+    const exists = count > 0;
 
     return {
       name: '실전 런북 (Runbooks)',
       passed: exists,
       message: exists 
-        ? `${fs.readdirSync(runbooksDir).length}개의 실전 에이전틱 런북이 준비됨`
+        ? `${count}개의 실전 에이전틱 런북이 준비됨`
         : 'runbooks 디렉터리가 비어 있습니다.',
       securityLevel: exists ? 'PASSED' : 'WARNING'
     };

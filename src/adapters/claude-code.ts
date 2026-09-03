@@ -56,6 +56,7 @@ export class ClaudeCodeAdapter {
 
         const mcpStep = blueprint.actionPlan.provisioningSteps.find(s => s.actionType === 'install_mcp');
         if (mcpStep && mcpStep.details?.mcps) {
+          let addedAny = false;
           for (const mcp of mcpStep.details.mcps) {
             if (!claudeJson.mcpServers[mcp.id]) {
               claudeJson.mcpServers[mcp.id] = {
@@ -64,12 +65,17 @@ export class ClaudeCodeAdapter {
                 args: mcp.args || ['-y', mcp.id],
                 env: mcp.env || {}
               };
+              addedAny = true;
             }
           }
-          // Safely backup and write
-          fs.writeFileSync(`${claudeJsonPath}.bak_axonboard`, fs.readFileSync(claudeJsonPath));
-          fs.writeFileSync(claudeJsonPath, JSON.stringify(claudeJson, null, 2), 'utf-8');
-          modifiedFiles.push(claudeJsonPath);
+          if (addedAny) {
+            // Safely backup (timestamped, so repeated runs never clobber the original)
+            // and write
+            const backupPath = `${claudeJsonPath}.bak_axonboard.${Date.now()}`;
+            fs.writeFileSync(backupPath, fs.readFileSync(claudeJsonPath));
+            fs.writeFileSync(claudeJsonPath, JSON.stringify(claudeJson, null, 2), 'utf-8');
+            modifiedFiles.push(claudeJsonPath);
+          }
         }
       } catch (err) {
         console.warn('Could not automatically patch ~/.claude.json, skipping file modification:', err);

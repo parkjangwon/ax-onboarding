@@ -4,6 +4,8 @@ set -e
 # ==============================================================================
 # Universal AX Onboarding - One-Line Clean Uninstaller (macOS & Linux)
 # Usage: curl -fsSL https://raw.githubusercontent.com/.../uninstall.sh | bash
+# Removes ONLY files/directories created by ax-onboarding.
+# User-owned custom files under ~/.ax are preserved.
 # ==============================================================================
 
 BOLD='\033[1m'
@@ -30,11 +32,13 @@ fi
 
 echo -e "\n${BLUE}1. 백업된 Claude 설정 복원 중...${NC}"
 CLAUDE_JSON="$HOME/.claude.json"
-BACKUP_CLAUDE_JSON="$HOME/.claude.json.bak_axonboard"
+# Restore from the LATEST timestamped backup (adapter creates .bak_axonboard.<ts>)
+LATEST_BACKUP="$(ls -1 "$HOME"/.claude.json.bak_axonboard.* 2>/dev/null | sort | tail -n 1 || true)"
 
-if [ -f "$BACKUP_CLAUDE_JSON" ]; then
-  cp "$BACKUP_CLAUDE_JSON" "$CLAUDE_JSON"
-  rm -f "$BACKUP_CLAUDE_JSON"
+if [ -n "$LATEST_BACKUP" ] && [ -f "$LATEST_BACKUP" ]; then
+  cp "$LATEST_BACKUP" "$CLAUDE_JSON"
+  # Clean up all stale ax-onboarding backups
+  rm -f "$HOME"/.claude.json.bak_axonboard.* 2>/dev/null || true
   echo -e "${GREEN}✓ ~/.claude.json 백업본으로부터 원상복구 완료${NC}"
 else
   echo -e "${YELLOW}ℹ ~/.claude.json 백업본 없음 (건너뜀)${NC}"
@@ -43,17 +47,35 @@ fi
 echo -e "\n${BLUE}2. 글로벌 전역 CLAUDE.md 연결 제거 중...${NC}"
 GLOBAL_CLAUDE_MD="$HOME/.claude/CLAUDE.md"
 if [ -f "$GLOBAL_CLAUDE_MD" ]; then
-  # Remove lines referencing .ax/CLAUDE.md
-  grep -v "\.ax/CLAUDE\.md" "$GLOBAL_CLAUDE_MD" > "${GLOBAL_CLAUDE_MD}.tmp" || true
-  mv "${GLOBAL_CLAUDE_MD}.tmp" "$GLOBAL_CLAUDE_MD"
-  echo -e "${GREEN}✓ ~/.claude/CLAUDE.md 내 AX 전역 링크 안전하게 제거 완료${NC}"
+  # Remove lines referencing .ax/CLAUDE.md or the AX reference marker
+  grep -v "\.ax/CLAUDE\.md" "$GLOBAL_CLAUDE_MD" | grep -v "AX Onboarding Rule Reference" > "${GLOBAL_CLAUDE_MD}.tmp" || true
+  if [ ! -s "${GLOBAL_CLAUDE_MD}.tmp" ] || [ "$(tr -d '[:space:]' < "${GLOBAL_CLAUDE_MD}.tmp")" = "" ]; then
+    rm -f "$GLOBAL_CLAUDE_MD" "${GLOBAL_CLAUDE_MD}.tmp"
+    echo -e "${GREEN}✓ 전역 CLAUDE.md (AX 전용) 제거 완료${NC}"
+  else
+    mv "${GLOBAL_CLAUDE_MD}.tmp" "$GLOBAL_CLAUDE_MD"
+    echo -e "${GREEN}✓ ~/.claude/CLAUDE.md 내 AX 전역 링크 안전하게 제거 완료${NC}"
+  fi
 fi
 
-echo -e "\n${BLUE}3. 글로벌 AX 저장소 (~/.ax) 완전 삭제 중...${NC}"
+echo -e "\n${BLUE}3. 글로벌 AX 산출물 (~/.ax) 정리 중...${NC}"
 AX_HOME="$HOME/.ax"
 if [ -d "$AX_HOME" ]; then
-  rm -rf "$AX_HOME"
-  echo -e "${GREEN}✓ ~/.ax 디렉터리 (런북, 인증정보, 캐시) 완전 삭제 완료${NC}"
+  # Remove ONLY known ax-onboarding artifacts; keep user-owned files
+  for ARTIFACT in "$AX_HOME/CLAUDE.md" "$AX_HOME/AGENTS.md" "$AX_HOME/runbooks" "$AX_HOME/.env.mcp" "$AX_HOME/.cache"; do
+    if [ -e "$ARTIFACT" ]; then
+      rm -rf "$ARTIFACT"
+      echo -e "${GREEN}✓ 제거됨: $ARTIFACT${NC}"
+    fi
+  done
+  # Remove ~/.ax only if nothing user-owned remains
+  REMAINING="$(ls -A "$AX_HOME" 2>/dev/null | grep -v '^\.manifest' || true)"
+  if [ -z "$REMAINING" ]; then
+    rm -rf "$AX_HOME"
+    echo -e "${GREEN}✓ ~/.ax 디렉터리 제거 완료${NC}"
+  else
+    echo -e "${YELLOW}ℹ ~/.ax 내 사용자 파일이 남아 있어 디렉터리를 유지합니다: $(echo "$REMAINING" | tr '\n' ' ')${NC}"
+  fi
 fi
 
 # Clean current working directory if local files exist

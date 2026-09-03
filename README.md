@@ -134,9 +134,9 @@ irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/u
 ```
 
 > **Clean Uninstall Guarantee:**
-> - Lossless restoration of `~/.claude.json` from backup.
+> - Lossless restoration of `~/.claude.json` from the latest timestamped backup.
 > - Preserves 100% of existing user rules in `~/.claude/CLAUDE.md`, safely unlinking only the AX line.
-> - Completely wipes `~/.ax` (runbooks, credentials, cache).
+> - Removes only ax-onboarding artifacts (`~/.ax` runbooks, credentials, engine cache) — **user-owned custom files under `~/.ax` are preserved**.
 
 ---
 

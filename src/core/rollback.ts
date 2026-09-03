@@ -4,42 +4,80 @@ import os from 'node:os';
 
 export class RollbackManager {
   /**
-   * Restores ~/.claude.json from backup if available, and cleans generated files in targetDir
+   * Restores ~/.claude.json from the latest timestamped backup if available,
+   * and removes ONLY the files/directories that ax-onboarding created.
+   * User-owned custom files under ~/.ax are preserved.
    */
   static rollback(targetDir?: string): { restoredFiles: string[]; deletedFiles: string[] } {
     const { GlobalPaths } = require('./paths.js');
     const restoredFiles: string[] = [];
     const deletedFiles: string[] = [];
 
-    // 1. Restore ~/.claude.json
+    // 1. Restore ~/.claude.json from the LATEST timestamped backup
     const claudeJsonPath = GlobalPaths.getClaudeJsonPath();
-    const backupPath = `${claudeJsonPath}.bak_axonboard`;
+    const backupDir = path.dirname(claudeJsonPath);
+    const backupPrefix = `${path.basename(claudeJsonPath)}.bak_axonboard`;
 
-    if (fs.existsSync(backupPath)) {
-      fs.copyFileSync(backupPath, claudeJsonPath);
-      fs.unlinkSync(backupPath);
-      restoredFiles.push(claudeJsonPath);
+    if (fs.existsSync(backupDir)) {
+      const backups = fs.readdirSync(backupDir)
+        .filter(f => f.startsWith(backupPrefix))
+        .sort(); // lexicographic = chronological for timestamps
+      if (backups.length > 0) {
+        const latestBackup = path.join(backupDir, backups[backups.length - 1]);
+        fs.copyFileSync(latestBackup, claudeJsonPath);
+        restoredFiles.push(claudeJsonPath);
+        // Clean up ALL ax-onboarding backups (they are all stale after restore)
+        for (const b of backups) {
+          const bp = path.join(backupDir, b);
+          fs.unlinkSync(bp);
+          deletedFiles.push(bp);
+        }
+      }
     }
 
-    // 2. Clean Global ~/.ax files
+    // 2. Clean Global ~/.ax — remove ONLY known ax-onboarding artifacts,
+    //    preserving any user-owned custom files.
     const globalAxHome = GlobalPaths.getAxHome();
     if (fs.existsSync(globalAxHome)) {
-      fs.rmSync(globalAxHome, { recursive: true, force: true });
-      deletedFiles.push(globalAxHome);
+      const knownArtifacts: string[] = [
+        path.join(globalAxHome, 'CLAUDE.md'),   // claude-code adapter constitution
+        path.join(globalAxHome, 'AGENTS.md'),   // antigravity adapter constitution
+        path.join(globalAxHome, 'runbooks'),    // injected runbooks dir
+        path.join(globalAxHome, '.env.mcp'),    // global credentials file
+      ];
+      for (const artifact of knownArtifacts) {
+        if (fs.existsSync(artifact)) {
+          fs.rmSync(artifact, { recursive: true, force: true });
+          deletedFiles.push(artifact);
+        }
+      }
+      // Remove ~/.ax only if it is now empty (nothing user-owned left)
+      const remaining = fs.readdirSync(globalAxHome).filter(f => !f.startsWith('.manifest'));
+      if (remaining.length === 0) {
+        fs.rmSync(globalAxHome, { recursive: true, force: true });
+        deletedFiles.push(globalAxHome);
+      }
     }
 
-    // 3. Remove @~/.ax line from global ~/.claude/CLAUDE.md
+    // 3. Remove @~/.ax reference lines from global ~/.claude/CLAUDE.md
     const globalClaudeMd = GlobalPaths.getGlobalClaudeMdPath();
     if (fs.existsSync(globalClaudeMd)) {
-      let content = fs.readFileSync(globalClaudeMd, 'utf-8');
-      const filtered = content.split('\n').filter(line => !line.includes('.ax/CLAUDE.md')).join('\n');
-      fs.writeFileSync(globalClaudeMd, filtered, 'utf-8');
-      restoredFiles.push(globalClaudeMd);
+      const content = fs.readFileSync(globalClaudeMd, 'utf-8');
+      const filtered = content.split('\n').filter(line =>
+        !line.includes('.ax/CLAUDE.md') && !line.includes('AX Onboarding Rule Reference')
+      ).join('\n').trim();
+      if (filtered.length === 0) {
+        fs.unlinkSync(globalClaudeMd);
+        deletedFiles.push(globalClaudeMd);
+      } else {
+        fs.writeFileSync(globalClaudeMd, filtered + '\n', 'utf-8');
+        restoredFiles.push(globalClaudeMd);
+      }
     }
 
     // 4. Clean targetDir files if targetDir specified
     if (targetDir) {
-      // Remove local .ax directory
+      // Remove local .ax directory (contains only tool-generated constitution files)
       const localAxDir = path.join(targetDir, '.ax');
       if (fs.existsSync(localAxDir)) {
         fs.rmSync(localAxDir, { recursive: true, force: true });
@@ -57,7 +95,12 @@ export class RollbackManager {
           const content = fs.readFileSync(f, 'utf-8');
           const filtered = content
             .split('\n')
-            .filter(line => !line.includes('.ax/CLAUDE.md') && !line.includes('.ax/AGENTS.md') && !line.includes('AX Onboarding Rule Reference') && !line.includes('AX Onboarding Contract Reference'))
+            .filter(line =>
+              !line.includes('.ax/CLAUDE.md') &&
+              !line.includes('.ax/AGENTS.md') &&
+              !line.includes('AX Onboarding Rule Reference') &&
+              !line.includes('AX Onboarding Contract Reference')
+            )
             .join('\n')
             .trim();
 

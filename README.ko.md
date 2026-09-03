@@ -135,9 +135,9 @@ curl -fsSL https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/sc
 irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/uninstall.ps1 | iex
 ```
 
-- 백업해 둔 원본 `~/.claude.json`으로 무손실 복구
+- 최신 타임스탬프 백업으로 원본 `~/.claude.json` 무손실 복구
 - `~/.claude/CLAUDE.md`에서 온보딩 관련 연결 줄만 안전하게 제거 (기존 개인 규칙은 그대로 유지)
-- `~/.ax` 디렉토리(런북, 인증 정보, 캐시) 전체 삭제
+- ax-onboarding이 만든 파일만 제거 (`~/.ax` 내 런북·인증 정보·엔진 캐시) — **사용자가 직접 넣은 `~/.ax` 커스텀 파일은 보존**
 
 ---
 
