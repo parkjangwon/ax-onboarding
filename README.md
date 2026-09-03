@@ -28,33 +28,23 @@ Across the tech industry, enterprise AI transformation (AX) initiatives consiste
 
 The core engine is **100% open source and organization-agnostic**. Company-specific guidelines, internal GitLab remotes, proprietary plugins, and strict compliance rules are injected externally via **Pluggable Addons**.
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                   Universal AX Onboarding Core Engine                  │
-│                                                                        │
-│  [1. Daily Routine Intake] ──► [2. Task Decomposition] ──► [3. AX Blueprint] │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ Addon Injection (Pluggable)
-                                    ▼
-        ┌────────────────────────────────────────────────────────┐
-        │             Organization / Enterprise Addon            │
-        │   (e.g., acme-enterprise-addon.json, store-pack)    │
-        │   • Enterprise ground-rules (Mandatory DB READONLY)    │
-        │   • Internal VCS & CI/CD (GitLab 4-Phase workflows)    │
-        │   • Private MCP catalog & pre-approved toolchains      │
-        └───────────────────────────┬────────────────────────────┘
-                                    │ Automated Provisioning
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                   Cross-Platform Global Harness Layer                  │
-│                                                                        │
-│  • Global Scope   : User Home Directory (~/.ax and %USERPROFILE%\.ax)  │
-│  • Claude Code    : ~/.claude.json patched & ~/.claude/CLAUDE.md link  │
-│  • Antigravity    : ~/.ax/AGENTS.md universal agent operational rules  │
-│  • Claude Desktop : claude_desktop_config.json auto-injected (GUI)     │
-│  • Runbooks       : 5 production runbooks injected to ~/.ax/runbooks/  │
-│  • Multi-Project  : Active across all repositories, worktrees & paths  │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Core ["Universal AX Onboarding Core Engine"]
+        direction LR
+        S1["1. Daily Routine Intake"] --> S2["2. Task Decomposition"] --> S3["3. AX Blueprint"]
+    end
+
+    subgraph Addon ["Organization / Enterprise Addon (Pluggable)"]
+        A1["acme-enterprise-addon.json / custom-addon.json<br/>• Enterprise ground-rules (Mandatory DB READONLY)<br/>• Internal VCS & CI/CD (GitLab 4-Phase workflows)<br/>• Private MCP catalog & pre-approved toolchains"]
+    end
+
+    subgraph Harness ["Cross-Platform Global Harness Layer"]
+        H1["• Global Scope: User Home Directory (~/.ax and %USERPROFILE%\.ax)<br/>• Claude Code: ~/.claude.json patched & ~/.claude/CLAUDE.md linked<br/>• Antigravity: ~/.ax/AGENTS.md universal operational rules<br/>• Claude Desktop: claude_desktop_config.json auto-injected (GUI)<br/>• Runbooks: 5 production runbooks injected to ~/.ax/runbooks/<br/>• Multi-Project: Active across all repositories, worktrees & paths"]
+    end
+
+    Core -->|"Addon Injection (Pluggable)"| Addon
+    Addon -->|"Automated Provisioning"| Harness
 ```
 
 ---
