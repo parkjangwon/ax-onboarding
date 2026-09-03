@@ -39,17 +39,42 @@ export class RollbackManager {
 
     // 4. Clean targetDir files if targetDir specified
     if (targetDir) {
-      const filesToClean = [
+      // Remove local .ax directory
+      const localAxDir = path.join(targetDir, '.ax');
+      if (fs.existsSync(localAxDir)) {
+        fs.rmSync(localAxDir, { recursive: true, force: true });
+        deletedFiles.push(localAxDir);
+      }
+
+      // Safely unlink or clean references in CLAUDE.md and AGENTS.md
+      const ruleFiles = [
         path.join(targetDir, 'CLAUDE.md'),
-        path.join(targetDir, 'AGENTS.md'),
-        path.join(targetDir, '.env.mcp')
+        path.join(targetDir, 'AGENTS.md')
       ];
 
-      for (const f of filesToClean) {
+      for (const f of ruleFiles) {
         if (fs.existsSync(f)) {
-          fs.unlinkSync(f);
-          deletedFiles.push(f);
+          const content = fs.readFileSync(f, 'utf-8');
+          const filtered = content
+            .split('\n')
+            .filter(line => !line.includes('.ax/CLAUDE.md') && !line.includes('.ax/AGENTS.md') && !line.includes('AX Onboarding Rule Reference') && !line.includes('AX Onboarding Contract Reference'))
+            .join('\n')
+            .trim();
+
+          if (filtered.length === 0) {
+            fs.unlinkSync(f);
+            deletedFiles.push(f);
+          } else {
+            fs.writeFileSync(f, filtered + '\n', 'utf-8');
+            restoredFiles.push(f);
+          }
         }
+      }
+
+      const envFile = path.join(targetDir, '.env.mcp');
+      if (fs.existsSync(envFile)) {
+        fs.unlinkSync(envFile);
+        deletedFiles.push(envFile);
       }
 
       const runbooksDir = path.join(targetDir, 'runbooks');

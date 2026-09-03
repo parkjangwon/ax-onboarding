@@ -57,6 +57,24 @@ if [ -d "$AX_HOME" ]; then
 fi
 
 # Clean current working directory if local files exist
+if [ -d "./.ax" ]; then
+  rm -rf "./.ax"
+  echo -e "${GREEN}✓ 로컬 .ax 디렉터리 삭제 완료${NC}"
+fi
+
+for RULE_FILE in "./CLAUDE.md" "./AGENTS.md"; do
+  if [ -f "$RULE_FILE" ]; then
+    grep -v "\.ax/CLAUDE\.md" "$RULE_FILE" | grep -v "\.ax/AGENTS\.md" | grep -v "AX Onboarding" > "${RULE_FILE}.tmp" || true
+    if [ ! -s "${RULE_FILE}.tmp" ] || [ "$(tr -d '[:space:]' < "${RULE_FILE}.tmp")" = "" ]; then
+      rm -f "$RULE_FILE" "${RULE_FILE}.tmp"
+      echo -e "${GREEN}✓ 온보딩 전용 $RULE_FILE 안전하게 제거 완료${NC}"
+    else
+      mv "${RULE_FILE}.tmp" "$RULE_FILE"
+      echo -e "${GREEN}✓ $RULE_FILE 내 AX 연결 라인만 제거 (기존 개인 규칙 보존)${NC}"
+    fi
+  fi
+done
+
 if [ -f "./.env.mcp" ]; then
   rm -f "./.env.mcp"
   echo -e "${GREEN}✓ 로컬 .env.mcp 삭제 완료${NC}"

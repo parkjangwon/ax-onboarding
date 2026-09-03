@@ -8,43 +8,43 @@ export class ClaudeCodeAdapter {
     const { GlobalPaths } = require('../core/paths.js');
     const modifiedFiles: string[] = [];
 
-    // 1. Generate Global or Project-local CLAUDE.md
-    if (targetDir) {
-      const claudeMdPath = path.join(targetDir, 'CLAUDE.md');
-      const claudeMdContent = this.generateClaudeMd(blueprint);
-      fs.writeFileSync(claudeMdPath, claudeMdContent, 'utf-8');
-      modifiedFiles.push(claudeMdPath);
-
-      const { RunbookInjector } = require('../core/runbooks.js');
-      const runbookFiles = RunbookInjector.inject(targetDir);
-      modifiedFiles.push(...runbookFiles);
-    } else {
-      // Global Mode: ~/.ax/CLAUDE.md and reference in ~/.claude/CLAUDE.md
-      const globalAxMd = path.join(GlobalPaths.getAxHome(), 'CLAUDE.md');
-      const claudeMdContent = this.generateClaudeMd(blueprint);
-      fs.writeFileSync(globalAxMd, claudeMdContent, 'utf-8');
-      modifiedFiles.push(globalAxMd);
-
-      // Link in ~/.claude/CLAUDE.md
-      const globalClaudeMd = GlobalPaths.getGlobalClaudeMdPath();
-      let existing = '';
-      if (fs.existsSync(globalClaudeMd)) {
-        existing = fs.readFileSync(globalClaudeMd, 'utf-8');
-      }
-      const linkLine = `@${globalAxMd}`;
-      if (!existing.includes(linkLine)) {
-        const appended = existing.endsWith('\n') || existing.length === 0 
-          ? `${existing}${linkLine}\n` 
-          : `${existing}\n${linkLine}\n`;
-        fs.writeFileSync(globalClaudeMd, appended, 'utf-8');
-        modifiedFiles.push(globalClaudeMd);
-      }
-
-      // Inject runbooks to global ~/.ax/runbooks
-      const { RunbookInjector } = require('../core/runbooks.js');
-      const runbookFiles = RunbookInjector.inject();
-      modifiedFiles.push(...runbookFiles);
+    // 1. Generate Dedicated AX Constitution (~/.ax/CLAUDE.md or <targetDir>/.ax/CLAUDE.md)
+    const axDir = targetDir ? path.join(targetDir, '.ax') : GlobalPaths.getAxHome();
+    if (!fs.existsSync(axDir)) {
+      fs.mkdirSync(axDir, { recursive: true });
     }
+
+    const axClaudeMd = path.join(axDir, 'CLAUDE.md');
+    const claudeMdContent = this.generateClaudeMd(blueprint);
+    fs.writeFileSync(axClaudeMd, claudeMdContent, 'utf-8');
+    modifiedFiles.push(axClaudeMd);
+
+    // 2. Non-destructively inject reference line into user's existing CLAUDE.md
+    const userClaudeMd = targetDir 
+      ? path.join(targetDir, 'CLAUDE.md') 
+      : GlobalPaths.getGlobalClaudeMdPath();
+
+    const linkLine = `@${axClaudeMd}`;
+    let existingContent = '';
+    if (fs.existsSync(userClaudeMd)) {
+      existingContent = fs.readFileSync(userClaudeMd, 'utf-8');
+    }
+
+    if (!existingContent.includes(linkLine)) {
+      const refBlock = existingContent.length === 0
+        ? `# AX Onboarding Rule Reference\n${linkLine}\n`
+        : existingContent.endsWith('\n')
+          ? `\n# AX Onboarding Rule Reference\n${linkLine}\n`
+          : `\n\n# AX Onboarding Rule Reference\n${linkLine}\n`;
+      
+      fs.writeFileSync(userClaudeMd, existingContent + refBlock, 'utf-8');
+      modifiedFiles.push(userClaudeMd);
+    }
+
+    // 3. Inject runbooks
+    const { RunbookInjector } = require('../core/runbooks.js');
+    const runbookFiles = RunbookInjector.inject(targetDir);
+    modifiedFiles.push(...runbookFiles);
 
     // 2. Prepare MCP configuration snippet
     const homeDir = os.homedir();

@@ -91,12 +91,20 @@ describe('AdapterRegistry & Provisioning', () => {
 
     const claudeMd = path.join(tempDir, 'CLAUDE.md');
     const agentsMd = path.join(tempDir, 'AGENTS.md');
+    const axClaudeMd = path.join(tempDir, '.ax', 'CLAUDE.md');
+    const axAgentsMd = path.join(tempDir, '.ax', 'AGENTS.md');
+
     expect(fs.existsSync(claudeMd)).toBe(true);
     expect(fs.existsSync(agentsMd)).toBe(true);
+    expect(fs.existsSync(axClaudeMd)).toBe(true);
+    expect(fs.existsSync(axAgentsMd)).toBe(true);
 
-    const content = fs.readFileSync(claudeMd, 'utf-8');
-    expect(content).toContain('Ground Rules');
-    expect(content).toContain('Day-1 Quick Win Guide');
+    const claudeLinkContent = fs.readFileSync(claudeMd, 'utf-8');
+    expect(claudeLinkContent).toContain('.ax/CLAUDE.md');
+
+    const axContent = fs.readFileSync(axClaudeMd, 'utf-8');
+    expect(axContent).toContain('Ground Rules');
+    expect(axContent).toContain('Day-1 Quick Win Guide');
 
     // Clean up
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -192,17 +200,32 @@ describe('RunbookInjector & Preflight', () => {
 });
 
 describe('RollbackManager', () => {
-  it('should cleanly remove generated files during rollback', () => {
+  it('should cleanly remove generated files during rollback and preserve existing user rules', () => {
     const { RollbackManager } = require('../src/core/rollback.js');
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-rbk-'));
 
-    fs.writeFileSync(path.join(tempDir, 'CLAUDE.md'), 'test');
+    // User already had custom rules in CLAUDE.md!
+    const originalRule = '# Existing Custom User Rule\n@my-custom-doc.md\n';
+    const claudeMdPath = path.join(tempDir, 'CLAUDE.md');
+    fs.writeFileSync(claudeMdPath, originalRule + '\n# AX Onboarding Rule Reference\n@.ax/CLAUDE.md\n');
+
+    // Create local .ax and runbooks
+    fs.mkdirSync(path.join(tempDir, '.ax'));
+    fs.writeFileSync(path.join(tempDir, '.ax', 'CLAUDE.md'), 'ax rules');
     fs.mkdirSync(path.join(tempDir, 'runbooks'));
     fs.writeFileSync(path.join(tempDir, 'runbooks', 'dummy.md'), 'test');
 
     const res = RollbackManager.rollback(tempDir);
-    expect(res.deletedFiles.length).toBeGreaterThanOrEqual(2);
-    expect(fs.existsSync(path.join(tempDir, 'CLAUDE.md'))).toBe(false);
+    expect(res.restoredFiles).toContain(claudeMdPath);
+    expect(fs.existsSync(claudeMdPath)).toBe(true);
+
+    // Existing rule is 100% preserved!
+    const restoredContent = fs.readFileSync(claudeMdPath, 'utf-8');
+    expect(restoredContent).toContain('Existing Custom User Rule');
+    expect(restoredContent).not.toContain('.ax/CLAUDE.md');
+
+    // Local .ax and runbooks are deleted
+    expect(fs.existsSync(path.join(tempDir, '.ax'))).toBe(false);
     expect(fs.existsSync(path.join(tempDir, 'runbooks'))).toBe(false);
 
     fs.rmSync(tempDir, { recursive: true, force: true });

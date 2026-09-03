@@ -7,16 +7,40 @@ export class AntigravityAdapter {
     const { GlobalPaths } = require('../core/paths.js');
     const modifiedFiles: string[] = [];
 
-    // 1. Generate Global or Project-local AGENTS.md
-    const agentsMdPath = targetDir 
-      ? path.join(targetDir, 'AGENTS.md')
-      : GlobalPaths.getGlobalAgentsMdPath();
+    // 1. Generate Dedicated AX Constitution (~/.ax/AGENTS.md or <targetDir>/.ax/AGENTS.md)
+    const axDir = targetDir ? path.join(targetDir, '.ax') : GlobalPaths.getAxHome();
+    if (!fs.existsSync(axDir)) {
+      fs.mkdirSync(axDir, { recursive: true });
+    }
 
+    const axAgentsMd = path.join(axDir, 'AGENTS.md');
     const content = this.generateAgentsMd(blueprint);
-    fs.writeFileSync(agentsMdPath, content, 'utf-8');
-    modifiedFiles.push(agentsMdPath);
+    fs.writeFileSync(axAgentsMd, content, 'utf-8');
+    modifiedFiles.push(axAgentsMd);
 
-    // 2. Inject production runbooks
+    // 2. Non-destructively inject reference line into user's existing AGENTS.md
+    const userAgentsMd = targetDir 
+      ? path.join(targetDir, 'AGENTS.md')
+      : path.join(GlobalPaths.getHomeDir(), 'AGENTS.md');
+
+    const linkLine = `@${axAgentsMd}`;
+    let existingContent = '';
+    if (fs.existsSync(userAgentsMd)) {
+      existingContent = fs.readFileSync(userAgentsMd, 'utf-8');
+    }
+
+    if (!existingContent.includes(linkLine)) {
+      const refBlock = existingContent.length === 0
+        ? `# Agent Operational Contract\n\n<!-- AX Onboarding Contract Reference -->\n${linkLine}\n`
+        : existingContent.endsWith('\n')
+          ? `\n<!-- AX Onboarding Contract Reference -->\n${linkLine}\n`
+          : `\n\n<!-- AX Onboarding Contract Reference -->\n${linkLine}\n`;
+
+      fs.writeFileSync(userAgentsMd, existingContent + refBlock, 'utf-8');
+      modifiedFiles.push(userAgentsMd);
+    }
+
+    // 3. Inject production runbooks
     const { RunbookInjector } = require('../core/runbooks.js');
     const runbookFiles = RunbookInjector.inject(targetDir);
     modifiedFiles.push(...runbookFiles);
