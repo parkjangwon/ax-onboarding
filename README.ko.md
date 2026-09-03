@@ -7,6 +7,7 @@
 출근해서 모니터를 켠 순간부터 퇴근할 때까지 반복하는 일상 업무를 1:1 인터뷰로 짚어보고, 실제 내 손발이 되어줄 도구(MCP)와 스킬, 작업 규칙, 실전 런북을 PC 전역에 한 번에 세팅해 주는 오픈소스 온보딩 도구입니다.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/parkjangwon/ax-onboarding/actions/workflows/ci.yml/badge.svg)](https://github.com/parkjangwon/ax-onboarding/actions/workflows/ci.yml)
 [![Runtime: Bun / Node](https://img.shields.io/badge/Runtime-Bun%20%2F%20Node-black.svg)]()
 [![Protocol: MCP](https://img.shields.io/badge/Protocol-Model%20Context%20Protocol-orange.svg)]()
 [![Compatible: Claude | Antigravity | Codex | Cursor](https://img.shields.io/badge/Agents-Claude%20%7C%20Antigravity%20%7C%20Codex%20%7C%20Cursor-purple.svg)]()
