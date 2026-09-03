@@ -52,7 +52,7 @@ else
     git -C "$AX_CACHE_DIR" pull --quiet 2>/dev/null || true
   else
     echo -e "${BLUE}ℹ AX 온보딩 엔진 다운로드 중...${NC}"
-    git clone --depth 1 https://github.com/acme/ax-onboarding.git "$AX_CACHE_DIR" 2>/dev/null || {
+    git clone --depth 1 https://github.com/parkjangwon/ax-onboarding.git "$AX_CACHE_DIR" 2>/dev/null || {
       # Fallback if private repo or offline: check if local copy exists
       echo -e "${YELLOW}원격 저장소 다운로드 건너뜀 (로컬 런타임 구동)${NC}"
     }

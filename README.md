@@ -101,12 +101,12 @@ Run in your terminal to begin the interactive diagnosis and global harness setup
 
 **macOS / Linux**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell)**:
 ```powershell
-irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/install.ps1 | iex
 ```
 
 ### 🧹 One-Line Clean Uninstall
@@ -114,12 +114,12 @@ Restores your system to a pristine, 100% untouched state without leaving a singl
 
 **macOS / Linux**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/uninstall.sh | bash
 ```
 
 **Windows (PowerShell)**:
 ```powershell
-irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/uninstall.ps1 | iex
 ```
 
 > **Clean Uninstall Guarantee:**
@@ -139,7 +139,7 @@ bun start --rollback # to clean up
 
 ### Method 2: Agent-Native (`SKILL.md` or GitHub URL)
 Simply hand this repository URL to your AI agent (Claude Desktop, Cursor, Antigravity, ChatGPT):
-> *"Read https://github.com/acme/ax-onboarding and onboard me to an agentic workflow."*
+> *"Read https://github.com/parkjangwon/ax-onboarding and onboard me to an agentic workflow."*
 
 The agent parses `SKILL.md` and drives the 1:1 interview conversationally in chat.
 

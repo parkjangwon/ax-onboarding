@@ -103,12 +103,12 @@ flowchart TD
 
 **macOS / Linux**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/install.sh | bash
 ```
 
 **Windows (PowerShell)**:
 ```powershell
-irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/install.ps1 | iex
 ```
 
 ### 원라인 클린 삭제
@@ -116,12 +116,12 @@ irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/install.
 
 **macOS / Linux**:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/uninstall.sh | bash
 ```
 
 **Windows (PowerShell)**:
 ```powershell
-irm https://raw.githubusercontent.com/acme/ax-onboarding/master/scripts/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/uninstall.ps1 | iex
 ```
 
 - 백업해 둔 원본 `~/.claude.json`으로 무손실 복구
@@ -140,7 +140,7 @@ bun start --rollback # 설정 원상복구
 
 ### 에이전트 대화창에 직접 요청 (`SKILL.md`)
 Claude Desktop, Cursor, Antigravity 등 에이전트 채팅창에 저장소 주소만 건네면 됩니다.
-> "https://github.com/acme/ax-onboarding 읽고 내 업무에 맞게 AX 세팅해줘."
+> "https://github.com/parkjangwon/ax-onboarding 읽고 내 업무에 맞게 AX 세팅해줘."
 
 에이전트가 `SKILL.md`를 읽고 대화창 안에서 직접 1:1 인터뷰를 시작합니다.
 

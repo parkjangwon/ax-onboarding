@@ -41,7 +41,7 @@ if (Test-Path (Join-Path $currentDir "package.json")) {
         git -C $cacheDir pull --quiet
     } else {
         Write-Host "ℹ AX 온보딩 엔진 다운로드 중..." -ForegroundColor Blue
-        git clone --depth 1 https://github.com/acme/ax-onboarding.git $cacheDir 2>$null
+        git clone --depth 1 https://github.com/parkjangwon/ax-onboarding.git $cacheDir 2>$null
     }
 }
 
