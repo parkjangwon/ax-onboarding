@@ -197,9 +197,11 @@ describe('Security: CredentialManager', () => {
     });
 
     expect(fs.existsSync(envPath)).toBe(true);
-    const stat = fs.statSync(envPath);
-    // mode 0600 is 33152 in octal stat
-    expect(stat.mode & 0o777).toBe(0o600);
+    // POSIX file modes are a no-op on Windows — verify 0600 only where applicable
+    if (process.platform !== 'win32') {
+      const stat = fs.statSync(envPath);
+      expect(stat.mode & 0o777).toBe(0o600);
+    }
 
     const gitignoreContent = fs.readFileSync(path.join(tempDir, '.gitignore'), 'utf-8');
     expect(gitignoreContent).toContain('.env.mcp');
@@ -405,7 +407,8 @@ describe('RollbackManager', () => {
         const afterRecord = JSON.parse(lines[0]);
         const afterRemove = JSON.parse(lines[1]);
         expect(afterRecord.localTargets.length).toBe(1);
-        expect(afterRecord.localTargets[0]).toBe('/tmp/someproj');
+        // ManifestManager stores path.resolve() output — compare the same way
+        expect(afterRecord.localTargets[0]).toBe(path.resolve('/tmp/someproj'));
         expect(afterRemove.localTargets.length).toBe(0);
       } finally {
         fs.rmSync(scriptPath, { force: true });

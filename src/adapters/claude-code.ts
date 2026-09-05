@@ -25,7 +25,9 @@ export class ClaudeCodeAdapter {
       ? path.join(targetDir, 'CLAUDE.md') 
       : GlobalPaths.getGlobalClaudeMdPath();
 
-    const linkLine = `@${axClaudeMd}`;
+    // Forward slashes in the link line: rollback filters match on '.ax/CLAUDE.md'
+    // regardless of platform, so the reference must be separator-stable.
+    const linkLine = `@${axClaudeMd.split(path.sep).join('/')}`;
     let existingContent = '';
     if (fs.existsSync(userClaudeMd)) {
       existingContent = fs.readFileSync(userClaudeMd, 'utf-8');

@@ -24,7 +24,9 @@ export class AntigravityAdapter {
       ? path.join(targetDir, 'AGENTS.md')
       : path.join(GlobalPaths.getHomeDir(), 'AGENTS.md');
 
-    const linkLine = `@${axAgentsMd}`;
+    // Forward slashes in the link line: rollback filters match on '.ax/AGENTS.md'
+    // regardless of platform, so the reference must be separator-stable.
+    const linkLine = `@${axAgentsMd.split(path.sep).join('/')}`;
     let existingContent = '';
     if (fs.existsSync(userAgentsMd)) {
       existingContent = fs.readFileSync(userAgentsMd, 'utf-8');
