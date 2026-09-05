@@ -116,8 +116,16 @@ Present two separate, honest markdown tables:
    - Embed this protocol in the generated constitution so that every FUTURE setup requested from the agent stays reversible: (a) back up config files as `<original>.bak_axonboard.<timestamp>` before editing, (b) record created/modified files in `~/.ax/.manifest.json`, (c) edit user rules by reference line only, (d) prefer READONLY accounts and approval-gated destructive commands, (e) verify the change works and report what was changed.
    - 온보딩 당일뿐 아니라, 이후 대화로 요청하는 모든 추가 세팅까지 클린 롤백 가능성이 유지되도록 하는 장치입니다.
 
+### Phase 4.5: Reversibility Promise (롤백 보장 고지)
+프로비저닝을 마치면 반드시 사용자에게 되돌릴 수 있음을 알립니다:
+> "지금 세팅한 모든 것은 언제든 원상복구할 수 있습니다. 나중에 '원상복구해줘'라고만 말씀하세요."
+
+1. 사용자가 롤백을 요청하면: `~/.ax/.manifest.json`에 기록된 파일들을 제거하고, `.bak_axonboard.*` 백업본 중 **가장 오래된 것**(온보딩 이전 원본)으로 `~/.claude.json` 등을 복구한 뒤, 사용자 규칙 파일에서 AX 참조 한 줄만 제거합니다. 사용자가 직접 만든 커스텀 파일은 절대 지우지 않습니다.
+2. 저장소를 클론해 둔 환경이라면 `bun start --rollback`이 동일한 작업을 수행합니다 (선택사항).
+
 ### Phase 5: Contextual Day-1 Quick Win (내 자리의 실제 데이터로 체감하기)
 ⚠️ 절대 가상의 뜬구름 잡는 예시를 주지 마십시오.
+0. **구조 자가점검 (Self-Verification)**: 축하 메시지를 전달하기 전에 스스로 확인합니다 — 생성한 파일(`~/.ax/CLAUDE.md`, 런북)이 실제로 존재하는지, 사용자 규칙 파일에 참조 한 줄이 붙었는지, `~/.claude.json`을 수정했다면 여전히 유효한 JSON인지.
 1. 사용자의 실제 작업 공간에서 지금 당장 다룰 수 있는 **실제 파일이나 상태**를 찾습니다:
    - 방금 수정한 소스 코드의 `git diff`
    - 디렉토리에 존재하는 실제 오류 로그 파일 (`app.log`, `error.log`)

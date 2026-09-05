@@ -57,6 +57,8 @@ flowchart TD
     Addon -->|"Automated Provisioning"| Harness
 ```
 
+> **Deployment model**: The skill is the product — `SKILL.md` + runbook templates + archetype data run on any local agent with **zero code execution**. The bundled TypeScript engine (`src/`) is the deterministic reference implementation of the same safety procedures, doubling as terminal bootstrap/exit tooling for machines without an agent yet.
+
 ---
 
 ## 👥 Supported Role Archetypes
@@ -108,6 +110,8 @@ During setup, 5 production runbooks are installed directly into your global home
 
 ## ⚡ One-Line Install & Clean Uninstall
 
+> ℹ️ **This is the bootstrap path** — for machines that do not have a local agent yet. If you already use Claude Desktop / Claude Code / Cursor / Antigravity, the recommended way is the Agent-Native method below.
+
 ### 📥 One-Line Install
 Run in your terminal to begin the interactive diagnosis and global harness setup:
 
@@ -142,19 +146,19 @@ irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/u
 
 ---
 
-## 🚀 Alternative Usage Methods
+## 🚀 Two Ways to Run
 
-### Method 1: Local CLI Wizard
-```bash
-bun start          # or: npm start
-bun start --rollback # to clean up
-```
-
-### Method 2: Agent-Native (`SKILL.md` or GitHub URL)
-Simply hand this repository URL to your AI agent (Claude Desktop, Cursor, Antigravity, ChatGPT):
+### ✅ Recommended: Agent-Native (`SKILL.md`) — no terminal required
+Simply hand this repository URL to your local agent (Claude Desktop, Claude Code, Cursor, Antigravity):
 > *"Read https://github.com/parkjangwon/ax-onboarding and onboard me to an agentic workflow."*
 
-The agent parses `SKILL.md` and drives the 1:1 interview conversationally in chat.
+The agent parses `SKILL.md`, runs the 1:1 interview conversationally, and provisions the harness itself. Every change follows the Harness Extension Protocol, so it stays reversible forever — whenever you want it gone, just say "원상복구해줘" (restore everything) in chat.
+
+### 🔧 Bootstrap: Local CLI Wizard (debugging & agent-less machines)
+```bash
+bun start            # or: npm start
+bun start --rollback # to clean up
+```
 
 ---
 

@@ -58,6 +58,8 @@ flowchart TD
     Addon -->|"원클릭 프로비저닝"| Harness
 ```
 
+> **배포 모델**: 스킬이 제품입니다 — `SKILL.md` + 런북 템플릿 + 아키타입 데이터는 **코드 실행 없이도** 어떤 로컬 에이전트에서든 동작합니다. 번들된 TypeScript 엔진(`src/`)은 동일한 안전 절차의 결정론적 참조 구현이자, 아직 에이전트가 없는 머신을 위한 터미널 진입로/출구 도구입니다.
+
 ---
 
 ## 지원 직군 (Role Archetypes)
@@ -110,6 +112,8 @@ flowchart TD
 
 ## 원라인 설치 및 클린 삭제
 
+> ℹ️ **이 경로는 부트스트랩용입니다** — 아직 로컬 에이전트가 없는 머신을 위한 진입로예요. Claude Desktop / Claude Code / Cursor / Antigravity를 쓰신다면 아래 '에이전트 대화창에 직접 요청' 방식이 권장 경로입니다.
+
 ### 원라인 설치
 터미널에서 명령어 한 줄만 실행하면 환경 점검부터 전역 세팅까지 인터랙티브하게 진행됩니다.
 
@@ -143,19 +147,19 @@ irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/u
 
 ---
 
-## 다른 사용 방식
+## 두 가지 실행 방법
 
-### 로컬 터미널 위저드
+### ✅ 권장: 에이전트 대화창에 직접 요청 (`SKILL.md`) — 터미널 불필요
+Claude Desktop, Claude Code, Cursor, Antigravity 등 에이전트 채팅창에 저장소 주소만 건네면 됩니다.
+> "https://github.com/parkjangwon/ax-onboarding 읽고 내 업무에 맞게 AX 세팅해줘."
+
+에이전트가 `SKILL.md`를 읽고 대화창 안에서 직접 1:1 인터뷰를 시작해 하니스를 스스로 구축합니다. 모든 변경은 환경 확장 규약을 따르므로 영구히 되돌릴 수 있고, 지우고 싶으면 대화에서 "원상복구해줘" 한마디면 됩니다.
+
+### 🔧 부트스트랩: 로컬 터미널 위저드 (디버깅·에이전트 없는 머신)
 ```bash
 bun start            # 또는 npm start
 bun start --rollback # 설정 원상복구
 ```
-
-### 에이전트 대화창에 직접 요청 (`SKILL.md`)
-Claude Desktop, Cursor, Antigravity 등 에이전트 채팅창에 저장소 주소만 건네면 됩니다.
-> "https://github.com/parkjangwon/ax-onboarding 읽고 내 업무에 맞게 AX 세팅해줘."
-
-에이전트가 `SKILL.md`를 읽고 대화창 안에서 직접 1:1 인터뷰를 시작합니다.
 
 ---
 
