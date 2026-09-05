@@ -59,6 +59,8 @@ flowchart TD
 
 > **Deployment model**: The skill is the product — `SKILL.md` + runbook templates + archetype data run on any local agent with **zero code execution**. The bundled TypeScript engine (`src/`) is the deterministic reference implementation of the same safety procedures, doubling as terminal bootstrap/exit tooling for machines without an agent yet.
 
+📜 The full charter lives in **[PHILOSOPHY.md](PHILOSOPHY.md)** — the agent's first day at work, the renegotiation of task ownership, and the tomorrow-morning test. Every feature decision must pass it.
+
 ---
 
 ## 👥 Supported Role Archetypes

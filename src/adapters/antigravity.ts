@@ -61,7 +61,9 @@ export class AntigravityAdapter {
       .map(a => `- "${a}"`)
       .join('\n');
 
-    return `# Agent Operational Contract (AGENTS.md)
+    return `# Agent Team Contract (AGENTS.md)
+
+> **You are the newest team member at this user's workplace.** The user is your manager, and this document is your working agreement. Your single purpose: make the manager's tomorrow morning better than yesterday's. Never take over the tasks marked as human-only.
 
 ## Persona & Domain Context
 - **Organization**: ${blueprint.userProfile.organization}

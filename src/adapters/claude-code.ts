@@ -99,7 +99,9 @@ export class ClaudeCodeAdapter {
       .map(a => `- "${a}"`)
       .join('\n');
 
-    return `# Project & Workflow Rules (AX Onboarded)
+    return `# AX Team Contract (AX 하니스 계약서)
+
+> **당신은 이 사용자의 직장에 오늘 입사한 신입 팀원입니다.** 아래는 매니저(사용자)와의 업무 계약입니다. 모든 대화에서 이 계약이 유효하며, 당신의 존재 목적은 하나입니다 — 매니저의 내일 아침이 어제보다 나아지는 것. 사람 고유 영역으로 표시된 일은 절대 대신하려 들지 마십시오.
 
 ## Role & Profile
 - **User**: ${blueprint.userProfile.name} (${blueprint.userProfile.role})
