@@ -1,4 +1,4 @@
-import type { AXBlueprint, OrganizationAddon, RoleArchetype, UserTaskAnalysis, ProvisioningStep } from './types.js';
+import type { AXBlueprint, OrganizationAddon, RoleArchetype, UserTaskAnalysis, ProvisioningStep, TaskCategory } from './types.js';
 
 export interface RawInterviewData {
   name: string;
@@ -35,22 +35,27 @@ export class TaskAnalyzer {
       });
     }
 
-    // Incorporate user's actual interview pain points if mentioned
-    if (interview.painPointAnswers && interview.painPointAnswers.length > 0) {
-      for (const ans of interview.painPointAnswers) {
-        if (!ans || ans.trim().length === 0) continue;
-        tasks.push({
-          taskName: ans.trim(),
-          currentWorkflow: '수작업 수동 처리 및 컨텍스트 스위칭',
-          axWorkflow: '에이전트 배경 사전 분석 및 실시간 초안 작성 보조',
-          category: 'adhoc',
-          opportunityScore: 5,
-          requiredTools: {
-            mcps: archetype.recommendedToolchain.mcps?.slice(0, 1) || [],
-            skills: archetype.recommendedToolchain.skills?.slice(0, 1) || []
-          }
-        });
-      }
+    // Personalize: turn the user's own interview answers into first-class tasks,
+    // routed to the matching runbook / tooling based on keyword heuristics.
+    const MAX_PERSONAL_TASKS = 5;
+    const answers = Array.from(new Set(
+      [...(interview.routineAnswers || []), ...(interview.painPointAnswers || [])]
+        .map(a => (a || '').trim())
+        .filter(a => a.length >= 2)
+    ));
+    for (const ans of answers.slice(0, MAX_PERSONAL_TASKS)) {
+      const routed = this.routeAnswerToAx(ans);
+      tasks.push({
+        taskName: ans.length > 80 ? `${ans.slice(0, 80)}…` : ans,
+        currentWorkflow: '사용자가 매일 수작업으로 직접 반복 처리',
+        axWorkflow: routed.axWorkflow,
+        category: routed.category,
+        opportunityScore: 5,
+        requiredTools: {
+          mcps: archetype.recommendedToolchain.mcps?.slice(0, 1) || [],
+          skills: archetype.recommendedToolchain.skills?.slice(0, 1) || []
+        }
+      });
     }
 
     // Merge ground rules
@@ -136,6 +141,49 @@ export class TaskAnalyzer {
         provisioningSteps,
         day1QuickWin
       }
+    };
+  }
+
+  /**
+   * Deterministic keyword routing: maps the user's own words (interview answers)
+   * to the injected runbooks / MCP tooling, so the blueprint reflects what the
+   * user actually said instead of archetype templates only.
+   */
+  private static routeAnswerToAx(answer: string): { axWorkflow: string; category: TaskCategory } {
+    const lower = answer.toLowerCase();
+    if (/(로그|에러|오류|장애|배치|인시던트|서버점검|error|log|incident|outage)/i.test(lower)) {
+      return {
+        axWorkflow: '에이전트가 01-troubleshoot 런북 프로토콜(로그 추적 → 원인 코드 특정 → 안전 패치 제안)을 백그라운드에서 자동 적용',
+        category: 'adhoc'
+      };
+    }
+    if (/(고객|문의|민원|불만|회신|답변|답장|cs|inquiry|complaint)/i.test(lower)) {
+      return {
+        axWorkflow: '에이전트가 02-customer-inquiry 런북에 따라 [현상 - 원인 - 조치방안] 3단계 공식 회신 초안을 즉시 산출',
+        category: 'adhoc'
+      };
+    }
+    if (/(수정|패치|버그|리팩토링|배포|머지|mr|pr|branch|hotfix|patch)/i.test(lower)) {
+      return {
+        axWorkflow: '에이전트가 03-safe-patch 런북에 따라 하위 호환성을 유지하며 보수적으로 패치하고 MR/PR 브랜치까지 구성',
+        category: 'adhoc'
+      };
+    }
+    if (/(화면|ui|버튼|브라우저|프론트|캡처|e2e|browser)/i.test(lower)) {
+      return {
+        axWorkflow: '에이전트가 04-browser-e2e 런북(Playwright)으로 직접 화면을 가동해 콘솔 오류와 UI 결함을 캡처·분석',
+        category: 'adhoc'
+      };
+    }
+    if (/(엑셀|시트|주문|재고|발주|취합|정리|보고서|보고|원가|매출|송장|데이터|db|sql)/i.test(lower)) {
+      return {
+        axWorkflow: '에이전트가 연결된 MCP 도구(스프레드시트/DB)를 백그라운드에서 호출해 완결된 결과물(표/정리본)을 즉시 산출',
+        category: 'routine_daily'
+      };
+    }
+    return {
+      axWorkflow: '사용자가 일상어로 이 업무를 요청하면, 에이전트가 등록된 런북과 도구를 백그라운드에서 자동 적용해 초안/결과물을 산출',
+      category: 'routine_daily'
     };
   }
 

@@ -5,13 +5,15 @@ import type { RoleArchetype, RoleCategory } from './types.js';
 export class ArchetypeManager {
   private static archetypes: Map<string, RoleArchetype> = new Map();
 
-  static loadAll(dir?: string): Map<string, RoleArchetype> {
-    const targetDir = dir || path.join(import.meta.dirname, '..', 'archetypes');
-    const files = fs.readdirSync(targetDir).filter(f => f.endsWith('.json'));
-
+  static loadAll(): Map<string, RoleArchetype> {
+    // Archetype definitions are bundled with the engine — the directory is fixed,
+    // never caller-supplied, so the load path cannot be redirected.
+    const root = path.resolve(import.meta.dirname, '..', 'archetypes');
     this.archetypes.clear();
-    for (const file of files) {
-      const fullPath = path.join(targetDir, file);
+    for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      const fullPath = path.resolve(root, entry.name);
+      if (!fullPath.startsWith(root + path.sep)) continue; // containment guard
       const content = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
       this.archetypes.set(content.id, content as RoleArchetype);
     }

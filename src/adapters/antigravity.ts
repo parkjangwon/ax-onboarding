@@ -53,6 +53,11 @@ export class AntigravityAdapter {
     const taskList = blueprint.tasks
       .map(t => `- **${t.taskName}**: ${t.axWorkflow}`)
       .join('\n');
+    const interviewExcerpts = (blueprint.interviewRaw?.routineAnswers || [])
+      .map(a => (a || '').trim())
+      .filter(a => a.length > 0)
+      .map(a => `- "${a}"`)
+      .join('\n');
 
     return `# Agent Operational Contract (AGENTS.md)
 
@@ -60,7 +65,11 @@ export class AntigravityAdapter {
 - **Organization**: ${blueprint.userProfile.organization}
 - **Role**: ${blueprint.userProfile.role}
 - **Archetype**: ${blueprint.detectedArchetype}
-
+${interviewExcerpts ? `
+## User's Own Routine (Raw Interview Excerpts)
+The following are the user's actual recurring tasks, in their own words. Prioritize this context:
+${interviewExcerpts}
+` : ''}
 ## Ground Rules
 ${rulesList}
 

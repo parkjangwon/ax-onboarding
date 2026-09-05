@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 export interface HealthCheckItem {
   name: string;
@@ -101,7 +101,7 @@ export class PreflightHealthCheck {
 
   private static checkCommand(cmd: string, label: string): HealthCheckItem {
     try {
-      execSync(`which ${cmd} 2>/dev/null`, { stdio: 'ignore' });
+      execFileSync('which', [cmd], { stdio: 'ignore' });
       return {
         name: `실행 도구 (${label})`,
         passed: true,

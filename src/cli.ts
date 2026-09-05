@@ -173,32 +173,29 @@ async function main() {
   console.log('\n------------------------------------------------------');
   const confirm = await rl.question('\n이 청사진대로 로컬 에이전트 환경에 자동 세팅(프로비저닝)할까요? (Y/n): ');
   if (confirm.trim().toLowerCase() !== 'n') {
-    // 1. Check if DB credentials needed
-    const needsDb = archetype.category === 'tech' || addon?.addonId?.includes('acme');
-    if (needsDb) {
-      console.log('\n🔒 [보안 인증 설정] DB 연결 환경 점검:');
-      const dbUser = (await rl.question('사용할 DB 사용자 계정을 입력하세요 (기본: readonly): ')).trim() || 'readonly';
-      const { CredentialManager } = await import('./core/credentials.js');
-      const secCheck = CredentialManager.validateDbSecurity(dbUser);
-      if (!secCheck.isSafe) {
-        console.log('\n⚠️  ' + secCheck.warnings.join('\n⚠️  ') + '\n');
-      } else {
-        console.log('✅ [보안 검증 완료] 안전한 READONLY 계정 정책 준수 확인.');
-      }
-    }
+    // DB 계정 정책은 도구가 심문하거나 강제하지 않는다. READONLY 권고는 조직 애드온의
+    // groundRules와 생성된 규약 파일(텍스트)로 안내하고, 계정 선택은 사용자 몫으로 남긴다.
 
     // 2. Dispatch adapters (generates CLAUDE.md, AGENTS.md, runbooks/ etc.)
     const result = AdapterRegistry.dispatch(agentEnvironment, blueprint, targetDir);
+
+    // Record the locally-provisioned scope so a later no-arg `--rollback`
+    // (separate process) can still find and clean this project directory.
+    if (targetDir) {
+      const { ManifestManager } = await import('./core/manifest.js');
+      ManifestManager.recordLocalTarget(targetDir);
+    }
 
     // 3. Optionally install discovered skills
     if (discoveredSkills.length > 0) {
       const installSkills = await rl.question('\n위 추천 오픈소스 스킬도 함께 설치할까요? (Y/n): ');
       if (installSkills.trim().toLowerCase() !== 'n') {
-        const { execSync } = await import('node:child_process');
+        const { execFileSync } = await import('node:child_process');
         for (const s of discoveredSkills) {
           try {
             console.log(`⚙️  설치 중: ${s.packageId}...`);
-            execSync(s.installCommand, { stdio: 'inherit' });
+            // packageId is regex-validated upstream; spawn without a shell
+            execFileSync('npx', ['skills', 'add', s.packageId, '-y'], { stdio: 'inherit' });
           } catch {
             console.warn(`스킬 설치 실패 (수동 설치 권장: ${s.installCommand})`);
           }

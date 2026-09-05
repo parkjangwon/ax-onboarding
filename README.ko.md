@@ -101,7 +101,7 @@ flowchart TD
 
 ## 보안 및 권한 격리
 
-- **DB 읽기 전용(READONLY) 강제**: `root`, `admin`, `sa` 같은 관리자 계정 입력을 차단하고, 반드시 `GRANT SELECT`만 부여된 계정을 쓰도록 유도합니다.
+- **DB 읽기 전용(READONLY) 권고 (Advisory)**: 에이전트 연결에는 `root`, `admin`, `sa` 같은 관리자 계정보다 `GRANT SELECT`만 부여된 읽기 전용 전용 계정을 쓰도록 권고합니다(생성된 규약 파일의 ground rules를 통해 안내). 도구는 안내할 뿐, 사용자의 선택을 강제하지 않습니다.
 - **자격 증명 파일 격리 (`.env.mcp`)**: 민감한 접속 정보는 Git 저장소가 아닌 홈 디렉토리(`~/.ax/.env.mcp`)에 `chmod 600` 권한으로 따로 보관합니다. 실수로 커밋될 위험을 사전에 차단합니다.
 - **위험 명령어 안전장치**: `rm -rf`, `drop database`, `reboot` 같은 파괴적인 명령은 사용자 승인 없이 실행하지 못하도록 작업 규칙에 명시합니다.
 
@@ -138,6 +138,7 @@ irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/u
 - 최신 타임스탬프 백업으로 원본 `~/.claude.json` 무손실 복구
 - `~/.claude/CLAUDE.md`에서 온보딩 관련 연결 줄만 안전하게 제거 (기존 개인 규칙은 그대로 유지)
 - ax-onboarding이 만든 파일만 제거 (`~/.ax` 내 런북·인증 정보·엔진 캐시) — **사용자가 직접 넣은 `~/.ax` 커스텀 파일은 보존**
+- 설치 매니페스트(`~/.ax/.manifest.json`)에 기록된 로컬 프로젝트 세팅분까지 함께 원상복구
 
 ---
 
@@ -170,7 +171,7 @@ bun test
 - 롤백 복구 무결성
 - 크로스 플랫폼 경로 지원
 
-*(14개 단위 테스트 통과)*
+*(19개 단위 테스트 통과)*
 
 ---
 

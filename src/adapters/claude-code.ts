@@ -90,6 +90,11 @@ export class ClaudeCodeAdapter {
     const taskList = blueprint.tasks
       .map(t => `### [${t.taskName}] (${t.category})\n- **현재 방식**: ${t.currentWorkflow}\n- **AX 에이전틱 방식**: ${t.axWorkflow}`)
       .join('\n\n');
+    const interviewExcerpts = (blueprint.interviewRaw?.routineAnswers || [])
+      .map(a => (a || '').trim())
+      .filter(a => a.length > 0)
+      .map(a => `- "${a}"`)
+      .join('\n');
 
     return `# Project & Workflow Rules (AX Onboarded)
 
@@ -98,8 +103,11 @@ export class ClaudeCodeAdapter {
 - **Organization**: ${blueprint.userProfile.organization}
 - **Archetype**: ${blueprint.detectedArchetype}
 ${blueprint.appliedAddon ? `- **Active Addon**: ${blueprint.appliedAddon}\n` : ''}
+${interviewExcerpts ? `## 실제 업무 루틴 (사용자 인터뷰 발췌)
+아래는 사용자가 직접 말한 실제 반복 업무입니다. 관련 요청이 오면 이 맥락을 우선 참고하십시오:
+${interviewExcerpts}
 
-## Ground Rules (작업 규약)
+` : ''}## Ground Rules (작업 규약)
 ${rulesList}
 
 ## 🧠 Autonomous Intent Routing (무명령어 자연어 자동 실행 원칙)

@@ -68,6 +68,32 @@ describe('TaskAnalyzer & Blueprint', () => {
   });
 });
 
+describe('TaskAnalyzer Personalization (interview answers actually used)', () => {
+  it('should turn routine interview answers into personalized runbook-routed tasks', () => {
+    const archetype = ArchetypeManager.get('tech-engineer')!;
+
+    const blueprint = TaskAnalyzer.analyze(
+      {
+        name: '테스터',
+        role: '엔지니어',
+        organization: '테스트',
+        agentEnvironment: 'claude-code',
+        routineAnswers: ['매일 오전에 배치 에러 로그를 수작업으로 확인함', '', '고객사에서 문의 오면 엑셀 취합해서 회신'],
+        painPointAnswers: []
+      },
+      archetype
+    );
+
+    const personalized = blueprint.tasks.filter(
+      t => t.taskName.includes('배치 에러 로그') || t.taskName.includes('고객사에서 문의')
+    );
+    expect(personalized.length).toBe(2);
+    expect(personalized[0].axWorkflow).toContain('01-troubleshoot');
+    expect(personalized[1].axWorkflow).toContain('02-customer-inquiry');
+    expect(blueprint.interviewRaw?.routineAnswers.length).toBe(3);
+  });
+});
+
 describe('AdapterRegistry & Provisioning', () => {
   it('should generate CLAUDE.md and AGENTS.md in target directory without errors', () => {
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-test-'));
@@ -251,7 +277,7 @@ describe('RollbackManager', () => {
   });
 
   it('global rollback should preserve user-owned custom files in ~/.ax (not rm -rf whole dir)', () => {
-    const { execSync } = require('node:child_process');
+    const { execFileSync } = require('node:child_process');
     const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-home-'));
     try {
       // Set up a fake ~/.ax exactly as a user would: tool artifacts + a user-owned file
@@ -277,9 +303,10 @@ describe('RollbackManager', () => {
       const scriptPath = path.join(process.cwd(), '.rollback-test-tmp.ts');
       fs.writeFileSync(scriptPath, script);
       try {
-        const out = execSync(`HOME=${JSON.stringify(fakeHome)} bun ${JSON.stringify(scriptPath)}`, {
+        const out = execFileSync('bun', [scriptPath], {
           cwd: process.cwd(),
-          encoding: 'utf-8'
+          encoding: 'utf-8',
+          env: { ...process.env, HOME: fakeHome }
         });
         const res = JSON.parse(out.trim().split('\n').pop());
 
@@ -292,6 +319,97 @@ describe('RollbackManager', () => {
         expect(fs.existsSync(userFile)).toBe(true);
         expect(fs.existsSync(path.join(userDir, 'data.txt'))).toBe(true);
         expect(res.deletedFiles.some(f => f.includes('custom-backups'))).toBe(false);
+      } finally {
+        fs.rmSync(scriptPath, { force: true });
+      }
+    } finally {
+      fs.rmSync(fakeHome, { recursive: true, force: true });
+    }
+  });
+
+  it('no-arg rollback should also clean manifest-recorded local targets (CLI scope is not persisted between runs)', () => {
+    const { execFileSync } = require('node:child_process');
+    const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-home2-'));
+    const localProj = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-localproj-'));
+    try {
+      // Global manifest recording the locally-provisioned project
+      const axDir = path.join(fakeHome, '.ax');
+      fs.mkdirSync(axDir, { recursive: true });
+      fs.writeFileSync(path.join(axDir, '.manifest.json'), JSON.stringify({
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        localTargets: [localProj]
+      }));
+
+      // Locally-provisioned artifacts + a user-owned rule that MUST survive
+      fs.mkdirSync(path.join(localProj, '.ax'));
+      fs.writeFileSync(path.join(localProj, '.ax', 'CLAUDE.md'), 'ax rules');
+      fs.mkdirSync(path.join(localProj, 'runbooks'));
+      fs.writeFileSync(path.join(localProj, 'runbooks', '01-troubleshoot.md'), 'rb');
+      const userRule = '# My Precious Rule\n@my-doc.md\n';
+      fs.writeFileSync(path.join(localProj, 'CLAUDE.md'), userRule + '\n# AX Onboarding Rule Reference\n@.ax/CLAUDE.md\n');
+
+      const script = `
+        import { RollbackManager } from './src/core/rollback.ts';
+        const res = RollbackManager.rollback();
+        console.log(JSON.stringify(res));
+      `;
+      const scriptPath = path.join(process.cwd(), '.rollback-manifest-test-tmp.ts');
+      fs.writeFileSync(scriptPath, script);
+      try {
+        const out = execFileSync('bun', [scriptPath], {
+          cwd: process.cwd(),
+          encoding: 'utf-8',
+          env: { ...process.env, HOME: fakeHome }
+        });
+        JSON.parse(out.trim().split('\n').pop());
+
+        // Local tool artifacts cleaned via manifest
+        expect(fs.existsSync(path.join(localProj, '.ax'))).toBe(false);
+        expect(fs.existsSync(path.join(localProj, 'runbooks'))).toBe(false);
+
+        // User-owned rule preserved, AX reference removed
+        const restored = fs.readFileSync(path.join(localProj, 'CLAUDE.md'), 'utf-8');
+        expect(restored).toContain('My Precious Rule');
+        expect(restored).not.toContain('.ax/CLAUDE.md');
+
+        // Manifest itself removed after use
+        expect(fs.existsSync(path.join(axDir, '.manifest.json'))).toBe(false);
+      } finally {
+        fs.rmSync(scriptPath, { force: true });
+      }
+    } finally {
+      fs.rmSync(fakeHome, { recursive: true, force: true });
+      fs.rmSync(localProj, { recursive: true, force: true });
+    }
+  });
+
+  it('ManifestManager should record (deduped) and remove local targets under HOME', () => {
+    const { execFileSync } = require('node:child_process');
+    const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-man-'));
+    try {
+      const script = `
+        import { ManifestManager } from './src/core/manifest.ts';
+        ManifestManager.recordLocalTarget('/tmp/someproj');
+        ManifestManager.recordLocalTarget('/tmp/someproj');
+        console.log(JSON.stringify(ManifestManager.read()));
+        ManifestManager.removeLocalTarget('/tmp/someproj');
+        console.log(JSON.stringify(ManifestManager.read()));
+      `;
+      const scriptPath = path.join(process.cwd(), '.manifest-test-tmp.ts');
+      fs.writeFileSync(scriptPath, script);
+      try {
+        const out = execFileSync('bun', [scriptPath], {
+          cwd: process.cwd(),
+          encoding: 'utf-8',
+          env: { ...process.env, HOME: fakeHome }
+        });
+        const lines = out.trim().split('\n');
+        const afterRecord = JSON.parse(lines[0]);
+        const afterRemove = JSON.parse(lines[1]);
+        expect(afterRecord.localTargets.length).toBe(1);
+        expect(afterRecord.localTargets[0]).toBe('/tmp/someproj');
+        expect(afterRemove.localTargets.length).toBe(0);
       } finally {
         fs.rmSync(scriptPath, { force: true });
       }

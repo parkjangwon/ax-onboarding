@@ -99,7 +99,7 @@ During setup, 5 production runbooks are installed directly into your global home
 
 ## 🛡️ Enterprise-Grade Security & Isolation
 
-- **Mandatory DB READONLY Gate**: Rejects administrator accounts (`root`, `admin`, `sa`). Requires a dedicated read-only database user (`GRANT SELECT`).
+- **DB READONLY Guidance (Advisory)**: Recommends connecting agents through a dedicated read-only database user (`GRANT SELECT`) instead of administrator accounts (`root`, `admin`, `sa`) — via ground rules injected into the generated constitutions. The tool informs; the user decides.
 - **Zero-Leak Credential Storage**: Sensitive credentials are saved to `~/.ax/.env.mcp` with strict `chmod 600` permissions and automatically appended to `.gitignore`. No secrets are ever committed.
 - **Guarded Commands**: Prohibits destructive commands (`rm -rf`, `drop database`, `reboot`) without explicit interactive user approval.
 
@@ -137,6 +137,7 @@ irm https://raw.githubusercontent.com/parkjangwon/ax-onboarding/master/scripts/u
 > - Lossless restoration of `~/.claude.json` from the latest timestamped backup.
 > - Preserves 100% of existing user rules in `~/.claude/CLAUDE.md`, safely unlinking only the AX line.
 > - Removes only ax-onboarding artifacts (`~/.ax` runbooks, credentials, engine cache) — **user-owned custom files under `~/.ax` are preserved**.
+> - Locally-provisioned project directories recorded in the install manifest (`~/.ax/.manifest.json`) are restored as well.
 
 ---
 
@@ -168,7 +169,7 @@ bun test
 - Runbook injection, healthchecks, and rollback mechanics
 - Cross-platform path resolution
 
-*(14 unit tests, 100% passing)*
+*(19 unit tests, 100% passing)*
 
 ---
 

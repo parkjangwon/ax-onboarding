@@ -7,6 +7,7 @@ export { AdapterRegistry } from './adapters/index.js';
 export { CredentialManager } from './core/credentials.js';
 export { PreflightHealthCheck } from './core/healthcheck.js';
 export { RollbackManager } from './core/rollback.js';
+export { ManifestManager } from './core/manifest.js';
 export { GlobalPaths } from './core/paths.js';
 export { SkillFinder } from './core/skill-finder.js';
 export { McpFinder } from './core/mcp-finder.js';
