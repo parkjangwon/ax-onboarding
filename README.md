@@ -102,6 +102,7 @@ During setup, 5 production runbooks are installed directly into your global home
 - **DB READONLY Guidance (Advisory)**: Recommends connecting agents through a dedicated read-only database user (`GRANT SELECT`) instead of administrator accounts (`root`, `admin`, `sa`) — via ground rules injected into the generated constitutions. The tool informs; the user decides.
 - **Zero-Leak Credential Storage**: Sensitive credentials are saved to `~/.ax/.env.mcp` with strict `chmod 600` permissions and automatically appended to `.gitignore`. No secrets are ever committed.
 - **Guarded Commands**: Prohibits destructive commands (`rm -rf`, `drop database`, `reboot`) without explicit interactive user approval.
+- **Self-Extension Safety**: Setup requested from the agent *after* onboarding follows the same protocol — backup before config edits, manifest bookkeeping, reference-line-only edits — so the harness stays fully reversible for its entire lifetime.
 
 ---
 

@@ -140,6 +140,13 @@ describe('AdapterRegistry & Provisioning', () => {
     const axContent = fs.readFileSync(axClaudeMd, 'utf-8');
     expect(axContent).toContain('Ground Rules');
     expect(axContent).toContain('Day-1 Quick Win Guide');
+    // The harness must teach the agent how to self-extend safely (post-onboarding setups stay reversible)
+    expect(axContent).toContain('환경 확장 규약');
+    expect(axContent).toContain('.manifest.json');
+
+    const axAgentsContent = fs.readFileSync(axAgentsMd, 'utf-8');
+    expect(axAgentsContent).toContain('Harness Extension Protocol');
+    expect(axAgentsContent).toContain('.manifest.json');
 
     // Clean up
     fs.rmSync(tempDir, { recursive: true, force: true });

@@ -84,6 +84,14 @@ Automatically map user intents to internal runbooks and tools in the background:
 - UI defects -> Apply \`~/.ax/runbooks/04-browser-e2e.md\` (Playwright inspection).
 - Data, sheets, stock, orders -> Call connected MCP tools silently.
 
+## Harness Extension Protocol (Safe Self-Extension)
+When the user requests additional setup AFTER onboarding (new MCP server, tool install, rule additions), follow this procedure so every future change stays reversible:
+1. **Backup before modify**: Copy any existing config file (~/.claude.json, claude_desktop_config.json, ...) to \`<original>.bak_axonboard.<timestamp>\` before editing it.
+2. **Record in the manifest**: Append created/modified files and locally-provisioned project paths to \`~/.ax/.manifest.json\` so a later rollback can restore everything.
+3. **Non-destructive edits**: Never overwrite the user's CLAUDE.md/AGENTS.md - only add/remove the single reference line. Never overwrite an existing file of the same name (runbooks included).
+4. **Least privilege first**: Propose READONLY database accounts; run destructive commands only after explicit user approval.
+5. **Verify and report**: Confirm the change works (connection test / file check) and summarize what was changed for the user.
+
 ## Task Delegation Matrix (Verified Feasible on PC)
 ${taskList}
 

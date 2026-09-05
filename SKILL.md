@@ -112,6 +112,9 @@ Present two separate, honest markdown tables:
    - If a runbook file already exists, do NOT overwrite it.
 4. **Autonomous Natural Language Routing (무명령어 원칙)**:
    - Ensure the generated rules instruct the agent: **"사용자에게 어떠한 명령어(/command)나 런북 파일 경로 입력도 요구하지 말고, 일상어로 말하면 백그라운드에서 적절한 런북과 도구를 무의식적인 반사신경으로 가동할 것."**
+5. **Harness Extension Protocol (자기 확장 안전장치)**:
+   - Embed this protocol in the generated constitution so that every FUTURE setup requested from the agent stays reversible: (a) back up config files as `<original>.bak_axonboard.<timestamp>` before editing, (b) record created/modified files in `~/.ax/.manifest.json`, (c) edit user rules by reference line only, (d) prefer READONLY accounts and approval-gated destructive commands, (e) verify the change works and report what was changed.
+   - 온보딩 당일뿐 아니라, 이후 대화로 요청하는 모든 추가 세팅까지 클린 롤백 가능성이 유지되도록 하는 장치입니다.
 
 ### Phase 5: Contextual Day-1 Quick Win (내 자리의 실제 데이터로 체감하기)
 ⚠️ 절대 가상의 뜬구름 잡는 예시를 주지 마십시오.
