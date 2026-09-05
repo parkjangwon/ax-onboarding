@@ -1,6 +1,8 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { GlobalPaths } from './paths.js';
 
 export interface HealthCheckItem {
   name: string;
@@ -11,7 +13,6 @@ export interface HealthCheckItem {
 
 export class PreflightHealthCheck {
   static runAll(targetDir?: string): HealthCheckItem[] {
-    const { GlobalPaths } = require('./paths.js');
     const results: HealthCheckItem[] = [];
 
     // 1. Check Git and ignore protection (if targetDir is a git repo)
@@ -35,7 +36,6 @@ export class PreflightHealthCheck {
   }
 
   private static checkGlobalIsolation(): HealthCheckItem {
-    const { GlobalPaths } = require('./paths.js');
     const envPath = GlobalPaths.getGlobalEnvPath();
     const exists = fs.existsSync(envPath);
 
@@ -74,7 +74,6 @@ export class PreflightHealthCheck {
   }
 
   private static checkRunbooks(targetDir?: string): HealthCheckItem {
-    const { GlobalPaths } = require('./paths.js');
     const runbooksDir = targetDir
       ? path.join(targetDir, 'runbooks')
       : GlobalPaths.getGlobalRunbooksDir();
@@ -101,7 +100,12 @@ export class PreflightHealthCheck {
 
   private static checkCommand(cmd: string, label: string): HealthCheckItem {
     try {
-      execFileSync('which', [cmd], { stdio: 'ignore' });
+      // Literal executables in both branches — no shell, no dynamic command name
+      if (process.platform === 'win32') {
+        execFileSync('where', [cmd], { stdio: 'ignore' });
+      } else {
+        execFileSync('which', [cmd], { stdio: 'ignore' });
+      }
       return {
         name: `실행 도구 (${label})`,
         passed: true,
@@ -119,7 +123,6 @@ export class PreflightHealthCheck {
   }
 
   private static checkClaudeConfig(): HealthCheckItem {
-    const os = require('node:os');
     const claudeJsonPath = path.join(os.homedir(), '.claude.json');
 
     if (fs.existsSync(claudeJsonPath)) {

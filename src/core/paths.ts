@@ -11,14 +11,10 @@ export class GlobalPaths {
   }
 
   /**
-   * Global AX Home: ~/.ax
+   * Global AX Home: ~/.ax (pure path resolution — writers create it on demand)
    */
   static getAxHome(): string {
-    const axHome = path.join(this.getHomeDir(), '.ax');
-    if (!fs.existsSync(axHome)) {
-      fs.mkdirSync(axHome, { recursive: true });
-    }
-    return axHome;
+    return path.join(this.getHomeDir(), '.ax');
   }
 
   /**
@@ -67,14 +63,10 @@ export class GlobalPaths {
   }
 
   /**
-   * Global CLAUDE.md path: ~/.claude/CLAUDE.md
+   * Global CLAUDE.md path: ~/.claude/CLAUDE.md (pure path resolution — writers create the directory on demand)
    */
   static getGlobalClaudeMdPath(): string {
-    const claudeDir = this.getClaudeHome();
-    if (!fs.existsSync(claudeDir)) {
-      fs.mkdirSync(claudeDir, { recursive: true });
-    }
-    return path.join(claudeDir, 'CLAUDE.md');
+    return path.join(this.getClaudeHome(), 'CLAUDE.md');
   }
 
   /**

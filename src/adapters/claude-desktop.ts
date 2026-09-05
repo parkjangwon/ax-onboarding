@@ -1,16 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import type { AXBlueprint } from '../core/types.js';
+import { GlobalPaths } from '../core/paths.js';
 
 export class ClaudeDesktopAdapter {
   static provision(blueprint: AXBlueprint): { success: boolean; modifiedFiles: string[] } {
     const modifiedFiles: string[] = [];
-    const homeDir = os.homedir();
-    
-    // macOS config path: ~/Library/Application Support/Claude/claude_desktop_config.json
-    const configDir = path.join(homeDir, 'Library', 'Application Support', 'Claude');
-    const configPath = path.join(configDir, 'claude_desktop_config.json');
+
+    // Cross-platform config path (macOS ~/Library/..., Windows %APPDATA%/Claude/...)
+    const configPath = GlobalPaths.getClaudeDesktopConfigPath();
+    const configDir = path.dirname(configPath);
 
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });

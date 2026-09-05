@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { GlobalPaths } from './paths.js';
 
 export interface CredentialField {
   key: string;
@@ -41,7 +42,6 @@ export class CredentialManager {
    * with restrictive file permissions (chmod 600)
    */
   static saveSecureEnv(targetDir?: string, envMap: Record<string, string> = {}): string {
-    const { GlobalPaths } = require('./paths.js');
     const envPath = targetDir ? path.join(targetDir, '.env.mcp') : GlobalPaths.getGlobalEnvPath();
     
     // Ensure parent dir exists

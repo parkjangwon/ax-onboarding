@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import type { AXBlueprint } from '../core/types.js';
+import { GlobalPaths } from '../core/paths.js';
+import { RunbookInjector } from '../core/runbooks.js';
 
 export class ClaudeCodeAdapter {
   static provision(blueprint: AXBlueprint, targetDir?: string): { success: boolean; modifiedFiles: string[] } {
-    const { GlobalPaths } = require('../core/paths.js');
     const modifiedFiles: string[] = [];
 
     // 1. Generate Dedicated AX Constitution (~/.ax/CLAUDE.md or <targetDir>/.ax/CLAUDE.md)
@@ -36,13 +37,13 @@ export class ClaudeCodeAdapter {
         : existingContent.endsWith('\n')
           ? `\n# AX Onboarding Rule Reference\n${linkLine}\n`
           : `\n\n# AX Onboarding Rule Reference\n${linkLine}\n`;
-      
+
+      fs.mkdirSync(path.dirname(userClaudeMd), { recursive: true });
       fs.writeFileSync(userClaudeMd, existingContent + refBlock, 'utf-8');
       modifiedFiles.push(userClaudeMd);
     }
 
     // 3. Inject runbooks
-    const { RunbookInjector } = require('../core/runbooks.js');
     const runbookFiles = RunbookInjector.inject(targetDir);
     modifiedFiles.push(...runbookFiles);
 

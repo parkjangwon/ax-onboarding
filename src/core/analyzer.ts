@@ -27,7 +27,6 @@ export class TaskAnalyzer {
         currentWorkflow: item.currentPain,
         axWorkflow: item.axOpportunity,
         category: isRoutine ? 'routine_daily' : 'adhoc',
-        opportunityScore: 5,
         requiredTools: {
           mcps: archetype.recommendedToolchain.mcps?.slice(0, 2) || [],
           skills: archetype.recommendedToolchain.skills?.slice(0, 2) || []
@@ -50,7 +49,6 @@ export class TaskAnalyzer {
         currentWorkflow: '사용자가 매일 수작업으로 직접 반복 처리',
         axWorkflow: routed.axWorkflow,
         category: routed.category,
-        opportunityScore: 5,
         requiredTools: {
           mcps: archetype.recommendedToolchain.mcps?.slice(0, 1) || [],
           skills: archetype.recommendedToolchain.skills?.slice(0, 1) || []

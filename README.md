@@ -169,7 +169,7 @@ bun test
 - Runbook injection, healthchecks, and rollback mechanics
 - Cross-platform path resolution
 
-*(19 unit tests, 100% passing)*
+*(20 unit tests, 100% passing)*
 
 ---
 

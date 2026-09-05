@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { AXBlueprint } from '../core/types.js';
+import { GlobalPaths } from '../core/paths.js';
+import { RunbookInjector } from '../core/runbooks.js';
 
 export class AntigravityAdapter {
   static provision(blueprint: AXBlueprint, targetDir?: string): { success: boolean; modifiedFiles: string[] } {
-    const { GlobalPaths } = require('../core/paths.js');
     const modifiedFiles: string[] = [];
 
     // 1. Generate Dedicated AX Constitution (~/.ax/AGENTS.md or <targetDir>/.ax/AGENTS.md)
@@ -41,7 +42,6 @@ export class AntigravityAdapter {
     }
 
     // 3. Inject production runbooks
-    const { RunbookInjector } = require('../core/runbooks.js');
     const runbookFiles = RunbookInjector.inject(targetDir);
     modifiedFiles.push(...runbookFiles);
 

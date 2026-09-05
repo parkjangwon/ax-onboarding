@@ -82,7 +82,6 @@ export interface UserTaskAnalysis {
   currentWorkflow: string;
   axWorkflow: string;
   category: TaskCategory;
-  opportunityScore: number;
   feasibility?: FeasibilityCheck;
   requiredTools: {
     mcps: string[];

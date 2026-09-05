@@ -21,13 +21,12 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["taskName", "currentWorkflow", "axWorkflow", "category", "opportunityScore"],
+        "required": ["taskName", "currentWorkflow", "axWorkflow", "category"],
         "properties": {
           "taskName": { "type": "string" },
           "currentWorkflow": { "type": "string" },
           "axWorkflow": { "type": "string" },
           "category": { "type": "string", "enum": ["adhoc", "routine_daily", "routine_weekly", "co-work"] },
-          "opportunityScore": { "type": "integer", "minimum": 1, "maximum": 5 },
           "requiredTools": {
             "type": "object",
             "properties": {

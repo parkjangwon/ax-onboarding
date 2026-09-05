@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { GlobalPaths } from './paths.js';
 import { ManifestManager } from './manifest.js';
 
 export class RollbackManager {
@@ -12,14 +13,14 @@ export class RollbackManager {
    * recorded in the global manifest (~/.ax/.manifest.json).
    */
   static rollback(targetDir?: string): { restoredFiles: string[]; deletedFiles: string[] } {
-    const { GlobalPaths } = require('./paths.js');
     const restoredFiles: string[] = [];
     const deletedFiles: string[] = [];
 
     // 0. Read the manifest first — it lives inside ~/.ax which gets cleaned below.
     const manifest = ManifestManager.read();
 
-    // 1. Restore ~/.claude.json from the LATEST timestamped backup
+    // 1. Restore ~/.claude.json from the OLDEST timestamped backup — that is the
+    //    true pre-onboarding state, even if onboarding ran more than once.
     const claudeJsonPath = GlobalPaths.getClaudeJsonPath();
     const backupDir = path.dirname(claudeJsonPath);
     const backupPrefix = `${path.basename(claudeJsonPath)}.bak_axonboard`;
@@ -29,12 +30,31 @@ export class RollbackManager {
         .filter(f => f.startsWith(backupPrefix))
         .sort(); // lexicographic = chronological for timestamps
       if (backups.length > 0) {
-        const latestBackup = path.join(backupDir, backups[backups.length - 1]);
-        fs.copyFileSync(latestBackup, claudeJsonPath);
+        const originalBackup = path.join(backupDir, backups[0]);
+        fs.copyFileSync(originalBackup, claudeJsonPath);
         restoredFiles.push(claudeJsonPath);
         // Clean up ALL ax-onboarding backups (they are all stale after restore)
         for (const b of backups) {
           const bp = path.join(backupDir, b);
+          fs.unlinkSync(bp);
+          deletedFiles.push(bp);
+        }
+      }
+    }
+
+    // 1b. Restore Claude Desktop config from its OLDEST backup, same semantics.
+    const desktopConfigPath = GlobalPaths.getClaudeDesktopConfigPath();
+    const desktopBackupDir = path.dirname(desktopConfigPath);
+    const desktopBackupPrefix = `${path.basename(desktopConfigPath)}.bak_axonboard`;
+    if (fs.existsSync(desktopBackupDir)) {
+      const backups = fs.readdirSync(desktopBackupDir)
+        .filter(f => f.startsWith(desktopBackupPrefix))
+        .sort();
+      if (backups.length > 0) {
+        fs.copyFileSync(path.join(desktopBackupDir, backups[0]), desktopConfigPath);
+        restoredFiles.push(desktopConfigPath);
+        for (const b of backups) {
+          const bp = path.join(desktopBackupDir, b);
           fs.unlinkSync(bp);
           deletedFiles.push(bp);
         }

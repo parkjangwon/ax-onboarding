@@ -2,10 +2,18 @@ import { describe, expect, it } from 'bun:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { execFileSync } from 'node:child_process';
 import { ArchetypeManager } from '../src/core/archetypes.js';
 import { AddonLoader } from '../src/addons/loader.js';
 import { TaskAnalyzer } from '../src/core/analyzer.js';
 import { AdapterRegistry } from '../src/adapters/index.js';
+import { SkillFinder } from '../src/core/skill-finder.js';
+import { McpFinder } from '../src/core/mcp-finder.js';
+import { CredentialManager } from '../src/core/credentials.js';
+import { RunbookInjector } from '../src/core/runbooks.js';
+import { PreflightHealthCheck } from '../src/core/healthcheck.js';
+import { RollbackManager } from '../src/core/rollback.js';
+import { GlobalPaths } from '../src/core/paths.js';
 
 describe('ArchetypeManager', () => {
   it('should load all archetypes correctly', () => {
@@ -149,7 +157,6 @@ claude-office-skills/skills@excel-automation 14.5K installs
 sbroenne/mcp-server-excel@excel-mcp 1.6K installs
 └ https://skills.sh/sbroenne/mcp-server-excel/excel-mcp
 `;
-    const { SkillFinder } = require('../src/core/skill-finder.js');
     const skills = SkillFinder.parseOutput(mockOutput);
     expect(skills.length).toBe(2);
     expect(skills[0].packageId).toBe('claude-office-skills/skills@excel-automation');
@@ -164,7 +171,6 @@ describe('McpFinder', () => {
 {"name":"ThinAir Data","qualifiedName":"thinair/data","description":"Connect AI assistants to PostgreSQL, MySQL, or SQL Server.","useCount":20,"connectionUrl":"https://server.smithery.ai/thinair/data"}
 {"name":"PlanetScale","qualifiedName":"planetscale","description":"Manage databases and execute SQL queries securely.","useCount":2,"connectionUrl":"https://server.smithery.ai/planetscale"}
 `;
-    const { McpFinder } = require('../src/core/mcp-finder.js');
     const mcps = McpFinder.parseOutput(mockOutput);
     expect(mcps.length).toBe(2);
     expect(mcps[0].id).toBe('thinair/data');
@@ -175,7 +181,6 @@ describe('McpFinder', () => {
 
 describe('Security: CredentialManager', () => {
   it('should flag dangerous admin/root database users', () => {
-    const { CredentialManager } = require('../src/core/credentials.js');
     expect(CredentialManager.validateDbSecurity('root').isSafe).toBe(false);
     expect(CredentialManager.validateDbSecurity('admin').isSafe).toBe(false);
     expect(CredentialManager.validateDbSecurity('sa').isSafe).toBe(false);
@@ -184,7 +189,6 @@ describe('Security: CredentialManager', () => {
   });
 
   it('should save credentials with 0600 mode and update .gitignore', () => {
-    const { CredentialManager } = require('../src/core/credentials.js');
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-cred-'));
     
     const envPath = CredentialManager.saveSecureEnv(tempDir, {
@@ -206,7 +210,6 @@ describe('Security: CredentialManager', () => {
 
 describe('RunbookInjector & Preflight', () => {
   it('should inject 5 real-world runbooks into targetDir', () => {
-    const { RunbookInjector } = require('../src/core/runbooks.js');
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-rb-'));
 
     const injected = RunbookInjector.inject(tempDir);
@@ -228,14 +231,12 @@ describe('RunbookInjector & Preflight', () => {
   });
 
   it('should run preflight healthcheck cleanly', () => {
-    const { PreflightHealthCheck } = require('../src/core/healthcheck.js');
     const checks = PreflightHealthCheck.runAll(process.cwd());
     expect(checks.length).toBeGreaterThanOrEqual(3);
     expect(checks.some(c => c.name.includes('Git'))).toBe(true);
   });
 
   it('should NOT crash in global mode (undefined targetDir) — regression for path.join(undefined)', () => {
-    const { PreflightHealthCheck } = require('../src/core/healthcheck.js');
     let checks;
     expect(() => { checks = PreflightHealthCheck.runAll(undefined); }).not.toThrow();
     expect(checks.length).toBeGreaterThanOrEqual(3);
@@ -246,7 +247,6 @@ describe('RunbookInjector & Preflight', () => {
 
 describe('RollbackManager', () => {
   it('should cleanly remove generated files during rollback and preserve existing user rules', () => {
-    const { RollbackManager } = require('../src/core/rollback.js');
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-rbk-'));
 
     // User already had custom rules in CLAUDE.md!
@@ -277,7 +277,6 @@ describe('RollbackManager', () => {
   });
 
   it('global rollback should preserve user-owned custom files in ~/.ax (not rm -rf whole dir)', () => {
-    const { execFileSync } = require('node:child_process');
     const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-home-'));
     try {
       // Set up a fake ~/.ax exactly as a user would: tool artifacts + a user-owned file
@@ -306,7 +305,7 @@ describe('RollbackManager', () => {
         const out = execFileSync('bun', [scriptPath], {
           cwd: process.cwd(),
           encoding: 'utf-8',
-          env: { ...process.env, HOME: fakeHome }
+          env: { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome }
         });
         const res = JSON.parse(out.trim().split('\n').pop());
 
@@ -328,7 +327,6 @@ describe('RollbackManager', () => {
   });
 
   it('no-arg rollback should also clean manifest-recorded local targets (CLI scope is not persisted between runs)', () => {
-    const { execFileSync } = require('node:child_process');
     const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-home2-'));
     const localProj = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-localproj-'));
     try {
@@ -360,7 +358,7 @@ describe('RollbackManager', () => {
         const out = execFileSync('bun', [scriptPath], {
           cwd: process.cwd(),
           encoding: 'utf-8',
-          env: { ...process.env, HOME: fakeHome }
+          env: { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome }
         });
         JSON.parse(out.trim().split('\n').pop());
 
@@ -385,7 +383,6 @@ describe('RollbackManager', () => {
   });
 
   it('ManifestManager should record (deduped) and remove local targets under HOME', () => {
-    const { execFileSync } = require('node:child_process');
     const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-man-'));
     try {
       const script = `
@@ -402,7 +399,7 @@ describe('RollbackManager', () => {
         const out = execFileSync('bun', [scriptPath], {
           cwd: process.cwd(),
           encoding: 'utf-8',
-          env: { ...process.env, HOME: fakeHome }
+          env: { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome }
         });
         const lines = out.trim().split('\n');
         const afterRecord = JSON.parse(lines[0]);
@@ -417,20 +414,60 @@ describe('RollbackManager', () => {
       fs.rmSync(fakeHome, { recursive: true, force: true });
     }
   });
+
+  it('should restore ~/.claude.json from the OLDEST backup (true pre-onboarding state)', () => {
+    const fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'ax-bak-'));
+    try {
+      // Two onboarding runs happened: oldest backup = original, newest = after run 1
+      const claudeJson = path.join(fakeHome, '.claude.json');
+      fs.writeFileSync(claudeJson, '{"mcpServers":{"from-second-run":true}}');
+      fs.writeFileSync(path.join(fakeHome, '.claude.json.bak_axonboard.1000'), '{"mcpServers":{}}');
+      fs.writeFileSync(path.join(fakeHome, '.claude.json.bak_axonboard.2000'), '{"mcpServers":{"from-first-run":true}}');
+
+      const script = `
+        import { RollbackManager } from './src/core/rollback.ts';
+        console.log(JSON.stringify(RollbackManager.rollback()));
+      `;
+      const scriptPath = path.join(process.cwd(), '.rollback-bak-test-tmp.ts');
+      fs.writeFileSync(scriptPath, script);
+      try {
+        const out = execFileSync('bun', [scriptPath], {
+          cwd: process.cwd(),
+          encoding: 'utf-8',
+          env: { ...process.env, HOME: fakeHome, USERPROFILE: fakeHome }
+        });
+        JSON.parse(out.trim().split('\n').pop());
+
+        // Restored to the true pre-onboarding state, not the intermediate one
+        const restored = JSON.parse(fs.readFileSync(claudeJson, 'utf-8'));
+        expect(restored.mcpServers['from-second-run']).toBeUndefined();
+        expect(restored.mcpServers['from-first-run']).toBeUndefined();
+
+        // All tool backups cleaned up after restore
+        const leftovers = fs.readdirSync(fakeHome).filter(f => f.includes('.bak_axonboard'));
+        expect(leftovers.length).toBe(0);
+      } finally {
+        fs.rmSync(scriptPath, { force: true });
+      }
+    } finally {
+      fs.rmSync(fakeHome, { recursive: true, force: true });
+    }
+  });
 });
 
 describe('Cross-Platform: GlobalPaths', () => {
   it('should resolve user home directory and global AX paths seamlessly', () => {
-    const { GlobalPaths } = require('../src/core/paths.js');
     const home = GlobalPaths.getHomeDir();
     expect(home.length).toBeGreaterThan(0);
 
+    // Pure path resolution — getters must NOT create directories as a side effect
     const axHome = GlobalPaths.getAxHome();
     expect(axHome).toContain('.ax');
-    expect(fs.existsSync(axHome)).toBe(true);
+    expect(path.basename(axHome)).toBe('.ax');
 
     const runbooksDir = GlobalPaths.getGlobalRunbooksDir();
     expect(runbooksDir).toContain('runbooks');
+    expect(fs.existsSync(runbooksDir)).toBe(true); // ensure-style getter creates on demand
 
     const envPath = GlobalPaths.getGlobalEnvPath();
     expect(envPath).toContain('.env.mcp');
